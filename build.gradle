@@ -1,0 +1,10 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.5.31'
+}
+
+group = 'com.yuyakaido'
+version = '0.0.0'
+
+repositories {
+    mavenCentral()
+}
