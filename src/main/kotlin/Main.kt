@@ -1,11 +1,6 @@
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType
-import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -13,18 +8,21 @@ import retrofit2.http.Query
 fun main() {
     println("Started!")
 
-    val json = Json {
-        ignoreUnknownKeys = true
-    }
-    val retrofit = Retrofit.Builder()
-        .baseUrl("https://api.bybit.com/")
-        .addConverterFactory(json.asConverterFactory(MediaType.get("application/json")))
-        .build()
-    val client = retrofit.create(HttpClient::class.java)
-    runBlocking {
-        val response = client.get()
-        println(response)
-    }
+    println("BYBIT_API_KEY = ${System.getProperty("BYBIT_API_KEY")}")
+    println("BYBIT_API_SECRET = ${System.getProperty("BYBIT_API_SECRET")}")
+
+//    val json = Json {
+//        ignoreUnknownKeys = true
+//    }
+//    val retrofit = Retrofit.Builder()
+//        .baseUrl("https://api.bybit.com/")
+//        .addConverterFactory(json.asConverterFactory(MediaType.get("application/json")))
+//        .build()
+//    val client = retrofit.create(HttpClient::class.java)
+//    runBlocking {
+//        val response = client.get()
+//        println(response)
+//    }
 
     println("Completed!")
 }

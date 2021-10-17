@@ -1,10 +1,21 @@
 plugins {
+    id 'application'
     id 'org.jetbrains.kotlin.jvm' version '1.5.31'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.31'
 }
 
 group = 'com.yuyakaido'
 version = '0.0.0'
+
+apply from: 'credentials.gradle'
+
+application {
+    mainClass = 'MainKt'
+    applicationDefaultJvmArgs = [
+            "-DBYBIT_API_KEY=${BYBIT_API_KEY}",
+            "-DBYBIT_API_SECRET=${BYBIT_API_SECRET}"
+    ]
+}
 
 repositories {
     mavenCentral()
