@@ -7,6 +7,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType
 import retrofit2.Retrofit
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 @ExperimentalSerializationApi
 fun main() {
@@ -16,7 +17,7 @@ fun main() {
         ignoreUnknownKeys = true
     }
     val retrofit = Retrofit.Builder()
-        .baseUrl("https://httpbin.org/")
+        .baseUrl("https://api.bybit.com/")
         .addConverterFactory(json.asConverterFactory(MediaType.get("application/json")))
         .build()
     val client = retrofit.create(HttpClient::class.java)
@@ -29,12 +30,20 @@ fun main() {
 }
 
 interface HttpClient {
-    @GET("get")
-    suspend fun get(): Response
+    @GET("/v2/public/funding/prev-funding-rate")
+    suspend fun get(
+        @Query("symbol") symbol: String = "BTCUSD"
+    ): Response
 }
 
 @Serializable
 data class Response(
-    @SerialName("origin") val origin: String,
-    @SerialName("url") val url: String
-)
+    @SerialName("result") val result: Result
+) {
+    @Serializable
+    data class Result(
+        @SerialName("symbol") val symbol: String,
+        @SerialName("funding_rate") val fundingRate: String,
+        @SerialName("funding_rate_timestamp") val fundingRateTimestamp: Long
+    )
+}
