@@ -35,11 +35,11 @@ fun main() {
     val client = retrofit.create(HttpClient::class.java)
 
     runBlocking {
-        val response = client.getAssetExchangeRecord(
+        val response = client.getSpotTradeHistory(
             queries = generateQueries(bybitApiKey, bybitApiSecret)
         )
         response.results.forEach { result ->
-            println("${result.fromAmount}${result.fromCoin} to ${result.toAmount}${result.toCoin} (Rate: 1${result.fromCoin}=${result.exchangeRate}${result.toCoin} at ${result.createdAt})")
+            println(result)
         }
     }
 
@@ -95,6 +95,11 @@ interface HttpClient {
     suspend fun getAssetExchangeRecord(
         @QueryMap queries: Map<String, String>
     ): AssetExchangeRecordResponse
+
+    @GET("/spot/v1/myTrades")
+    suspend fun getSpotTradeHistory(
+        @QueryMap queries: Map<String, String>
+    ): SpotTradeHistoryResponse
 }
 
 @ExperimentalSerializationApi
@@ -146,5 +151,22 @@ data class AssetExchangeRecordResponse(
         @SerialName("exchange_rate") @Contextual val exchangeRate: BigDecimal,
         @SerialName("from_fee") @Contextual val fromFee: BigDecimal,
         @SerialName("created_at") val createdAt: String
+    )
+}
+
+@Serializable
+data class SpotTradeHistoryResponse(
+    @SerialName("result") val results: List<Result>
+) {
+    @Serializable
+    data class Result(
+        @SerialName("id") val id: String,
+        @SerialName("symbol") val symbol: String,
+        @SerialName("price") val price: String,
+        @SerialName("qty") val qty: String,
+        @SerialName("commission") val commission: String,
+        @SerialName("commissionAsset") val commissionAsset: String,
+        @SerialName("isBuyer") val isBuyer: Boolean,
+        @SerialName("time") val time: String
     )
 }
