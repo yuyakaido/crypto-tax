@@ -41,8 +41,10 @@ fun main() {
     val client = retrofit.create(HttpClient::class.java)
 
     runBlocking {
-        val response = client.getSpotTradeHistory(generateQueries(bybitApiKey, bybitApiSecret))
-        outputBybitSpotTradeHistory(response)
+        val response = client.getWithdrawRecords(generateQueries(bybitApiKey, bybitApiSecret))
+        outputBybitWithdrawRecord(response)
+//        val response = client.getSpotTradeHistory(generateQueries(bybitApiKey, bybitApiSecret))
+//        outputBybitSpotTradeHistory(response)
     }
 
     println("Completed!")
@@ -82,18 +84,43 @@ private fun generateQueries(
     )
 }
 
+private fun outputBybitWithdrawRecord(
+    response: WithdrawRecordResponse
+) {
+    outputWithdrawRecord(
+        outputFileName = "bybit_withdraw_record",
+        records = response.toWithdrawRecords()
+    )
+}
+
 private fun outputBybitSpotTradeHistory(
     response: SpotTradeHistoryResponse
 ) {
     outputTradeHistory(
         outputFileName = "bybit_spot_trade_history",
-        results = response.toTradeHistories()
+        histories = response.toTradeHistories()
     )
+}
+
+private fun outputWithdrawRecord(
+    outputFileName: String,
+    records: List<WithdrawRecord>
+) {
+    val outputDirectory = File("${System.getProperty("user.dir")}/build/outputs")
+    outputDirectory.mkdir()
+    val outputFile = File("${outputDirectory.path}/$outputFileName.csv")
+    outputFile.createNewFile()
+    outputFile.bufferedWriter().apply {
+        appendLine(WithdrawRecord.CSV_HEADER)
+        records.forEach { history ->
+            appendLine(history.toCSV())
+        }
+    }.close()
 }
 
 private fun outputTradeHistory(
     outputFileName: String,
-    results: List<TradeHistory>
+    histories: List<TradeHistory>
 ) {
     val outputDirectory = File("${System.getProperty("user.dir")}/build/outputs")
     outputDirectory.mkdir()
@@ -101,8 +128,8 @@ private fun outputTradeHistory(
     outputFile.createNewFile()
     outputFile.bufferedWriter().apply {
         appendLine(TradeHistory.CSV_HEADER)
-        results.forEach { result ->
-            appendLine(result.toCSV())
+        histories.forEach { history ->
+            appendLine(history.toCSV())
         }
     }.close()
 }
@@ -131,6 +158,20 @@ enum class Asset {
     }
 }
 
+data class WithdrawRecord(
+    val withdrawnAt: ZonedDateTime,
+    val asset: Asset,
+    val amount: BigDecimal,
+    val fee: BigDecimal
+) {
+    companion object {
+        const val CSV_HEADER = "WithdrawnAt,Asset,Amount,Fee"
+    }
+    fun toCSV(): String {
+        return "$withdrawnAt,$asset,$amount,$fee"
+    }
+}
+
 data class TradeHistory(
     val tradedAt: ZonedDateTime,
     val pair: Pair<Asset, Asset>,
@@ -149,6 +190,11 @@ data class TradeHistory(
 }
 
 interface HttpClient {
+    @GET("/v2/private/wallet/withdraw/list")
+    suspend fun getWithdrawRecords(
+        @QueryMap queries: Map<String, String>
+    ): WithdrawRecordResponse
+
     @GET("/v2/private/exchange-order/list")
     suspend fun getAssetExchangeRecord(
         @QueryMap queries: Map<String, String>
@@ -170,6 +216,35 @@ object BigDecimalSerializer: KSerializer<BigDecimal> {
     override fun deserialize(decoder: Decoder): BigDecimal {
         val jsonDecoder = decoder as? JsonDecoder
         return BigDecimal(jsonDecoder?.decodeJsonElement().toString())
+    }
+}
+
+@Serializable
+data class WithdrawRecordResponse(
+    @SerialName("result") val result: Result
+) {
+    @Serializable
+    data class Result(
+        @SerialName("data") val data: List<Data>
+    ) {
+        @Serializable
+        data class Data(
+            @SerialName("id") val id: Long,
+            @SerialName("coin") val coin: String,
+            @SerialName("amount") val amount: String,
+            @SerialName("fee") val fee: String,
+            @SerialName("updated_at") val updatedAt: String
+        )
+    }
+    fun toWithdrawRecords(): List<WithdrawRecord> {
+        return result.data.map { d ->
+            WithdrawRecord(
+                withdrawnAt = ZonedDateTime.parse(d.updatedAt),
+                asset = Asset.single(d.coin),
+                amount = BigDecimal(d.amount),
+                fee = BigDecimal(d.fee)
+            )
+        }
     }
 }
 
