@@ -3,14 +3,20 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.*
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonEncoder
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.modules.serializersModuleOf
 import okhttp3.MediaType
 import retrofit2.Retrofit
 import retrofit2.http.GET
-import retrofit2.http.Query
 import retrofit2.http.QueryMap
+import java.io.File
 import java.math.BigDecimal
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import kotlin.system.exitProcess
@@ -35,12 +41,8 @@ fun main() {
     val client = retrofit.create(HttpClient::class.java)
 
     runBlocking {
-        val response = client.getSpotTradeHistory(
-            queries = generateQueries(bybitApiKey, bybitApiSecret)
-        )
-        response.results.forEach { result ->
-            println(result)
-        }
+        val response = client.getSpotTradeHistory(generateQueries(bybitApiKey, bybitApiSecret))
+        outputBybitSpotTradeHistory(response)
     }
 
     println("Completed!")
@@ -80,17 +82,73 @@ private fun generateQueries(
     )
 }
 
+private fun outputBybitSpotTradeHistory(
+    response: SpotTradeHistoryResponse
+) {
+    outputTradeHistory(
+        outputFileName = "bybit_spot_trade_history",
+        results = response.toTradeHistories()
+    )
+}
+
+private fun outputTradeHistory(
+    outputFileName: String,
+    results: List<TradeHistory>
+) {
+    val outputDirectory = File("${System.getProperty("user.dir")}/build/outputs")
+    outputDirectory.mkdir()
+    val outputFile = File("${outputDirectory.path}/$outputFileName.csv")
+    outputFile.createNewFile()
+    outputFile.bufferedWriter().apply {
+        appendLine(TradeHistory.CSV_HEADER)
+        results.forEach { result ->
+            appendLine(result.toCSV())
+        }
+    }.close()
+}
+
+enum class Side {
+    Buy, Sell
+}
+
+enum class Asset {
+    BTC,
+    ETH,
+    XRP,
+    EOS,
+    BIT,
+    USDT;
+
+    companion object {
+        fun pair(symbol: String): Pair<Asset, Asset> {
+            val first = values().first { symbol.startsWith(it.name) }
+            val second = values().first { symbol.endsWith(it.name) }
+            return first to second
+        }
+        fun single(asset: String): Asset {
+            return values().first { asset == it.name }
+        }
+    }
+}
+
+data class TradeHistory(
+    val tradedAt: ZonedDateTime,
+    val pair: Pair<Asset, Asset>,
+    val side: Side,
+    val price: BigDecimal,
+    val qty: BigDecimal,
+    val feeQty: BigDecimal,
+    val feeAsset: Asset
+) {
+    companion object {
+        const val CSV_HEADER = "TradedAt,Pair,Side,Price,Qty,FeeQty,FeeAsset"
+    }
+    fun toCSV(): String {
+        return "$tradedAt,${pair.first}/${pair.second},$side,$price,$qty,$feeQty,$feeAsset"
+    }
+}
+
 interface HttpClient {
-    @GET("/v2/public/funding/prev-funding-rate")
-    suspend fun getPreviousFundingRate(
-        @Query("symbol") symbol: String = "BTCUSD"
-    ): PreviousFundingRateResponse
-
-    @GET("/v2/private/account/api-key")
-    suspend fun getApiKeyInfo(
-        @QueryMap queries: Map<String, String>
-    ): ApiKeyInfoResponse
-
     @GET("/v2/private/exchange-order/list")
     suspend fun getAssetExchangeRecord(
         @QueryMap queries: Map<String, String>
@@ -113,28 +171,6 @@ object BigDecimalSerializer: KSerializer<BigDecimal> {
         val jsonDecoder = decoder as? JsonDecoder
         return BigDecimal(jsonDecoder?.decodeJsonElement().toString())
     }
-}
-
-@Serializable
-data class PreviousFundingRateResponse(
-    @SerialName("result") val result: Result
-) {
-    @Serializable
-    data class Result(
-        @SerialName("symbol") val symbol: String,
-        @SerialName("funding_rate") val fundingRate: String,
-        @SerialName("funding_rate_timestamp") val fundingRateTimestamp: Long
-    )
-}
-
-@Serializable
-data class ApiKeyInfoResponse(
-    @SerialName("result") val results: List<Result>
-) {
-    @Serializable
-    data class Result(
-        @SerialName("api_key") val apiKey: String
-    )
 }
 
 @Serializable
@@ -161,12 +197,26 @@ data class SpotTradeHistoryResponse(
     @Serializable
     data class Result(
         @SerialName("id") val id: String,
+        @SerialName("time") val time: String,
         @SerialName("symbol") val symbol: String,
+        @SerialName("isBuyer") val isBuyer: Boolean,
         @SerialName("price") val price: String,
         @SerialName("qty") val qty: String,
         @SerialName("commission") val commission: String,
-        @SerialName("commissionAsset") val commissionAsset: String,
-        @SerialName("isBuyer") val isBuyer: Boolean,
-        @SerialName("time") val time: String
+        @SerialName("commissionAsset") val commissionAsset: String
     )
+    fun toTradeHistories(): List<TradeHistory> {
+        return results
+            .map { result ->
+                TradeHistory(
+                    tradedAt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(result.time.toLong()), ZoneId.systemDefault()),
+                    pair = Asset.pair(result.symbol),
+                    side = if (result.isBuyer) { Side.Buy } else { Side.Sell },
+                    price = BigDecimal(result.price),
+                    qty = BigDecimal(result.qty),
+                    feeQty = BigDecimal(result.commission),
+                    feeAsset = Asset.single(result.commissionAsset)
+                )
+            }
+    }
 }

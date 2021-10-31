@@ -1,4 +1,7 @@
-.gradle
-.idea
-build
+# Directories
+/.gradle
+/.idea
+/build
+
+# Files
 credentials.gradle
