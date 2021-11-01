@@ -1,6 +1,7 @@
 package bybit
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -17,39 +18,40 @@ import javax.crypto.spec.SecretKeySpec
 @ExperimentalSerializationApi
 object BybitDownloader {
 
+    private val apiKey = System.getProperty("BYBIT_API_KEY")
+    private val apiSecret = System.getProperty("BYBIT_API_SECRET")
+    private val json = Json {
+        ignoreUnknownKeys = true
+        serializersModule = serializersModuleOf(BigDecimalSerializer)
+    }
+    private val retrofit = Retrofit.Builder()
+        .baseUrl("https://api.bybit.com/")
+        .addConverterFactory(json.asConverterFactory(MediaType.get("application/json")))
+        .build()
+    private val client = retrofit.create(BybitHttpClient::class.java)
+
     fun execute() {
-        val bybitApiKey = System.getProperty("BYBIT_API_KEY")
-        val bybitApiSecret = System.getProperty("BYBIT_API_SECRET")
-
-        val json = Json {
-            ignoreUnknownKeys = true
-            serializersModule = serializersModuleOf(BigDecimalSerializer)
-        }
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.bybit.com/")
-            .addConverterFactory(json.asConverterFactory(MediaType.get("application/json")))
-            .build()
-        val client = retrofit.create(BybitHttpClient::class.java)
-
         runBlocking {
-            val withdraw = client.getWithdrawRecords(generateQueries(bybitApiKey, bybitApiSecret))
-            outputBybitWithdrawRecord(withdraw)
-            val spotTrade = client.getSpotTradeHistory(generateQueries(bybitApiKey, bybitApiSecret))
-            outputBybitSpotTradeHistory(spotTrade)
+            val withdraw = client.getWithdrawRecords(generateQueries())
+            outputWithdrawRecord(withdraw)
+            val future = fetchFutureTradeHistory()
+            outputFutureTradeHistory(future)
+            val spotTrade = client.getSpotTradeHistory(generateQueries())
+            outputSpotTradeHistory(spotTrade)
         }
     }
 
     private fun generateQueries(
-        apiKey: String,
-        apiSecret: String,
         parameters: Map<String, String> = emptyMap()
     ): Map<String, String> {
+        // The parameters must be ordered in alphabetical order.
+        // https://bybit-exchange.github.io/docs/inverse/#t-authentication
         val queryMap = parameters.plus(
             mapOf(
                 "api_key" to apiKey,
                 "timestamp" to System.currentTimeMillis().toString()
             )
-        )
+        ).toSortedMap()
         val queryString = buildString {
             val iterator = queryMap.iterator()
             while (iterator.hasNext()) {
@@ -71,7 +73,29 @@ object BybitDownloader {
         )
     }
 
-    private fun outputBybitWithdrawRecord(
+    private suspend fun fetchFutureTradeHistory(): List<FutureTradeHistoryResponse> {
+        println("Fetching bybit future trade history")
+        val responses = mutableListOf<FutureTradeHistoryResponse>()
+        var page = 1
+        while (true) {
+            println("Page = $page")
+            val queries = generateQueries(
+                parameters = mapOf(
+                    "symbol" to "BTCUSD",
+                    "page" to page++.toString()
+                )
+            )
+            val future = client.getFutureTradeHistory(queries)
+            responses.add(future)
+            if (future.result.tradeList.size < 50) {
+                break
+            }
+            delay(5000)
+        }
+        return responses
+    }
+
+    private fun outputWithdrawRecord(
         response: WithdrawRecordResponse
     ) {
         outputWithdrawRecord(
@@ -80,7 +104,16 @@ object BybitDownloader {
         )
     }
 
-    private fun outputBybitSpotTradeHistory(
+    private fun outputFutureTradeHistory(
+        responses: List<FutureTradeHistoryResponse>
+    ) {
+        outputTradeHistory(
+            outputFileName = "bybit_future_trade_history",
+            histories = responses.flatMap { it.toTradeHistories() }
+        )
+    }
+
+    private fun outputSpotTradeHistory(
         response: SpotTradeHistoryResponse
     ) {
         outputTradeHistory(

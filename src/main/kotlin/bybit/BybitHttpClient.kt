@@ -14,6 +14,11 @@ interface BybitHttpClient {
         @QueryMap queries: Map<String, String>
     ): AssetExchangeRecordResponse
 
+    @GET("/v2/private/execution/list")
+    suspend fun getFutureTradeHistory(
+        @QueryMap queries: Map<String, String>
+    ): FutureTradeHistoryResponse
+
     @GET("/spot/v1/myTrades")
     suspend fun getSpotTradeHistory(
         @QueryMap queries: Map<String, String>

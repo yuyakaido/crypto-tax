@@ -13,7 +13,7 @@ data class TradeHistory(
     val feeAsset: Asset
 ) {
     companion object {
-        const val CSV_HEADER = "TradedAt,Pair,model.Side,Price,Qty,FeeQty,FeeAsset"
+        const val CSV_HEADER = "TradedAt,Pair,Side,Price,Qty,FeeQty,FeeAsset"
     }
     fun toCSV(): String {
         return "$tradedAt,${pair.first}/${pair.second},$side,$price,$qty,$feeQty,$feeAsset"

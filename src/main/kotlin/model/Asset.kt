@@ -1,9 +1,12 @@
 package model
 
 enum class Asset {
+    BTC,
     XRP,
     BIT,
-    USDT;
+    USD,
+    USDT,
+    UNKNOWN;
 
     companion object {
         fun pair(symbol: String): Pair<Asset, Asset> {
@@ -12,7 +15,10 @@ enum class Asset {
             return first to second
         }
         fun single(asset: String): Asset {
-            return values().first { asset == it.name }
+            return values().first { it.name == asset }
+        }
+        fun first(symbol: String): Asset {
+            return values().first { symbol.startsWith(it.name) }
         }
     }
 }
