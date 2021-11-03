@@ -15,9 +15,14 @@ interface BybitHttpClient {
     ): AssetExchangeRecordResponse
 
     @GET("/v2/private/execution/list")
-    suspend fun getFutureTradeHistory(
+    suspend fun getInversePerpetualTradeHistory(
         @QueryMap queries: Map<String, String>
-    ): FutureTradeHistoryResponse
+    ): InversePerpetualTradeHistoryResponse
+
+    @GET("/private/linear/trade/execution/list")
+    suspend fun getUSDTPerpetualTradeHistory(
+        @QueryMap queries: Map<String, String>
+    ): USDTPerpetualTradeHistoryResponse
 
     @GET("/spot/v1/myTrades")
     suspend fun getSpotTradeHistory(

@@ -12,34 +12,34 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 @Serializable
-data class FutureTradeHistoryResponse(
+data class USDTPerpetualTradeHistoryResponse(
     @SerialName("result") val result: Result
 ) {
     @Serializable
     data class Result(
-        @SerialName("trade_list") val tradeList: List<Trade>
+        @SerialName("data") val data: List<Data>
     ) {
         @Serializable
-        data class Trade(
+        data class Data(
             @SerialName("trade_time_ms") val tradeTimeMs: Long,
             @SerialName("symbol") val symbol: String,
             @SerialName("side") val side: String,
-            @SerialName("exec_price") val execPrice: String,
+            @SerialName("exec_price") val execPrice: JsonPrimitive,
             @SerialName("exec_qty") val execQty: JsonPrimitive,
-            @SerialName("exec_fee") val execFee: String
+            @SerialName("exec_fee") val execFee: JsonPrimitive
         )
     }
     fun toTradeHistories(): List<TradeHistory> {
-        return result.tradeList
+        return result.data
             .map { trade ->
                 TradeHistory(
                     tradedAt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(trade.tradeTimeMs), ZoneId.systemDefault()),
                     pair = Asset.pair(trade.symbol),
                     side = Side.from(trade.side),
-                    price = BigDecimal(trade.execPrice),
+                    price = BigDecimal(trade.execPrice.content),
                     qty = BigDecimal(trade.execQty.content),
-                    feeQty = BigDecimal(trade.execFee),
-                    feeAsset = Asset.first(trade.symbol)
+                    feeQty = BigDecimal(trade.execFee.content),
+                    feeAsset = Asset.second(trade.symbol)
                 )
             }
     }

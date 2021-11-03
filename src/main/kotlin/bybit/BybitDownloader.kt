@@ -32,12 +32,14 @@ object BybitDownloader {
 
     fun execute() {
         runBlocking {
-            val withdraw = client.getWithdrawRecords(generateQueries())
-            outputWithdrawRecord(withdraw)
-            val future = fetchFutureTradeHistory()
-            outputFutureTradeHistory(future)
-            val spotTrade = client.getSpotTradeHistory(generateQueries())
-            outputSpotTradeHistory(spotTrade)
+//            val withdraw = client.getWithdrawRecords(generateQueries())
+//            outputWithdrawRecord(withdraw)
+//            val inverse = fetchInversePerpetualTradeHistory()
+//            outputInversePerpetualTradeHistory(inverse)
+//            val usdt = fetchUSDTPerpetualTradeHistory()
+//            outputUSDTPerpetualTradeHistory(usdt)
+//            val spotTrade = client.getSpotTradeHistory(generateQueries())
+//            outputSpotTradeHistory(spotTrade)
         }
     }
 
@@ -73,9 +75,9 @@ object BybitDownloader {
         )
     }
 
-    private suspend fun fetchFutureTradeHistory(): List<FutureTradeHistoryResponse> {
-        println("Fetching bybit future trade history")
-        val responses = mutableListOf<FutureTradeHistoryResponse>()
+    private suspend fun fetchInversePerpetualTradeHistory(): List<InversePerpetualTradeHistoryResponse> {
+        println("Fetching bybit inverse perpetual trade history")
+        val responses = mutableListOf<InversePerpetualTradeHistoryResponse>()
         var page = 1
         while (true) {
             println("Page = $page")
@@ -85,9 +87,31 @@ object BybitDownloader {
                     "page" to page++.toString()
                 )
             )
-            val future = client.getFutureTradeHistory(queries)
+            val future = client.getInversePerpetualTradeHistory(queries)
             responses.add(future)
             if (future.result.tradeList.size < 50) {
+                break
+            }
+            delay(5000)
+        }
+        return responses
+    }
+
+    private suspend fun fetchUSDTPerpetualTradeHistory(): List<USDTPerpetualTradeHistoryResponse> {
+        println("Fetching bybit USDT perpetual trade history")
+        val responses = mutableListOf<USDTPerpetualTradeHistoryResponse>()
+        var page = 1
+        while (true) {
+            println("Page = $page")
+            val queries = generateQueries(
+                parameters = mapOf(
+                    "symbol" to "BTCUSDT",
+                    "page" to page++.toString()
+                )
+            )
+            val future = client.getUSDTPerpetualTradeHistory(queries)
+            responses.add(future)
+            if (future.result.data.size < 50) {
                 break
             }
             delay(5000)
@@ -104,11 +128,20 @@ object BybitDownloader {
         )
     }
 
-    private fun outputFutureTradeHistory(
-        responses: List<FutureTradeHistoryResponse>
+    private fun outputInversePerpetualTradeHistory(
+        responses: List<InversePerpetualTradeHistoryResponse>
     ) {
         outputTradeHistory(
-            outputFileName = "bybit_future_trade_history",
+            outputFileName = "bybit_inverse_perpetual_trade_history",
+            histories = responses.flatMap { it.toTradeHistories() }
+        )
+    }
+
+    private fun outputUSDTPerpetualTradeHistory(
+        responses: List<USDTPerpetualTradeHistoryResponse>
+    ) {
+        outputTradeHistory(
+            outputFileName = "bybit_usdt_perpetual_trade_history",
             histories = responses.flatMap { it.toTradeHistories() }
         )
     }

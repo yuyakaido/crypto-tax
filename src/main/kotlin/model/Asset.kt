@@ -20,5 +20,8 @@ enum class Asset {
         fun first(symbol: String): Asset {
             return values().first { symbol.startsWith(it.name) }
         }
+        fun second(symbol: String): Asset {
+            return values().first { symbol.endsWith(it.name) }
+        }
     }
 }
