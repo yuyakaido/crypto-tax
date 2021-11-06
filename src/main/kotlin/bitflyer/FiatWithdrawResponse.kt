@@ -4,7 +4,7 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import model.Asset
-import model.FiatWithdrawRecord
+import model.WithdrawRecord
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -18,8 +18,8 @@ data class FiatWithdrawResponse(
     @SerialName("status") val status: String,
     @SerialName("event_date") val eventDate: String
 ) {
-    fun toFiatWithdrawRecord(): FiatWithdrawRecord {
-        return FiatWithdrawRecord(
+    fun toWithdrawRecord(): WithdrawRecord {
+        return WithdrawRecord(
             withdrawnAt = LocalDateTime.parse(eventDate).atZone(ZoneOffset.UTC.normalized()),
             asset = Asset.single(currencyCode),
             amount = amount,

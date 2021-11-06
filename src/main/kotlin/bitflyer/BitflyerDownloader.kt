@@ -37,7 +37,7 @@ object BitflyerDownloader : Downloader {
         CsvExporter.export(
             DepositHistory(
                 name = "bitflyer_fiat_deposit_history",
-                lines = responses.map { it.toFiatDepositRecord() }
+                lines = responses.map { it.toDepositRecord() }
             )
         )
     }
@@ -46,7 +46,7 @@ object BitflyerDownloader : Downloader {
         CsvExporter.export(
             WithdrawHistory(
                 name = "bitflyer_fiat_withdraw_history",
-                lines = responses.map { it.toFiatWithdrawRecord() }
+                lines = responses.map { it.toWithdrawRecord() }
             )
         )
     }
@@ -55,7 +55,7 @@ object BitflyerDownloader : Downloader {
         CsvExporter.export(
             DepositHistory(
                 name = "bitflyer_coin_deposit_history",
-                lines = responses.map { it.toCoinDepositRecord() }
+                lines = responses.map { it.toDepositRecord() }
             )
         )
     }
@@ -64,7 +64,7 @@ object BitflyerDownloader : Downloader {
         CsvExporter.export(
             WithdrawHistory(
                 name = "bitflyer_coin_withdraw_history",
-                lines = responses.map { it.toCoinWithdrawRecord() }
+                lines = responses.map { it.toWithdrawRecord() }
             )
         )
     }

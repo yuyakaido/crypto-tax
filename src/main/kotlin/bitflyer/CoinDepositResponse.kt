@@ -4,7 +4,7 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import model.Asset
-import model.CoinDepositRecord
+import model.DepositRecord
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -20,8 +20,8 @@ data class CoinDepositResponse(
     @SerialName("status") val status: String,
     @SerialName("event_date") val eventDate: String
 ) {
-    fun toCoinDepositRecord(): CoinDepositRecord {
-        return CoinDepositRecord(
+    fun toDepositRecord(): DepositRecord {
+        return DepositRecord(
             depositedAt = LocalDateTime.parse(eventDate).atZone(ZoneOffset.UTC.normalized()),
             asset = Asset.single(currencyCode),
             amount = amount

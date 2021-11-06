@@ -3,7 +3,7 @@ package bybit
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import model.Asset
-import model.CoinWithdrawRecord
+import model.WithdrawRecord
 import java.math.BigDecimal
 import java.time.ZonedDateTime
 
@@ -24,10 +24,10 @@ data class WithdrawHistoryResponse(
             @SerialName("updated_at") val updatedAt: String
         )
     }
-    fun toWithdrawRecords(): List<CoinWithdrawRecord> {
+    fun toWithdrawRecords(): List<WithdrawRecord> {
         return result.data
             .map { d ->
-                CoinWithdrawRecord(
+                WithdrawRecord(
                     withdrawnAt = ZonedDateTime.parse(d.updatedAt),
                     asset = Asset.single(d.coin),
                     amount = BigDecimal(d.amount),
