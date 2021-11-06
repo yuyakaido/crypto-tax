@@ -2,6 +2,8 @@
 /.gradle
 /.idea
 /build
+/inputs
+/outputs
 
 # Files
 credentials.gradle

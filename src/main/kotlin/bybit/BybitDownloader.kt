@@ -1,35 +1,17 @@
 package bybit
 
-import common.Downloader
 import common.RetrofitCreator
-import csv.CsvExporter
-import csv.TradeHistory
-import csv.WithdrawHistory
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 
 @ExperimentalSerializationApi
-object BybitDownloader : Downloader {
+object BybitDownloader {
 
     private val apiKey = System.getProperty("BYBIT_API_KEY")
     private val apiSecret = System.getProperty("BYBIT_API_SECRET")
     private val client = RetrofitCreator
         .newInstance("https://api.bybit.com/")
         .create(BybitHttpClient::class.java)
-
-    override fun execute() {
-        runBlocking {
-//            val withdraw = client.getWithdrawHistory(generateQueries())
-//            exportWithdrawHistory(withdraw)
-//            val inverse = fetchInversePerpetualTradeHistory()
-//            exportInversePerpetualTradeHistory(inverse)
-//            val usdt = fetchUSDTPerpetualTradeHistory()
-//            exportUSDTPerpetualTradeHistory(usdt)
-//            val spot = fetchSpotTradeHistory()
-//            exportSpotTradeHistory(spot)
-        }
-    }
 
     private fun generateQueries(
         parameters: Map<String, String> = emptyMap()
@@ -57,7 +39,11 @@ object BybitDownloader : Downloader {
         )
     }
 
-    private suspend fun fetchInversePerpetualTradeHistory(): List<InversePerpetualTradeHistoryResponse> {
+    suspend fun downloadWithdrawHistory(): WithdrawHistoryResponse {
+        return client.getWithdrawHistory(generateQueries())
+    }
+
+    suspend fun downloadInversePerpetualTradeHistory(): List<InversePerpetualTradeHistoryResponse> {
         println("Fetching bybit inverse perpetual trade history")
         val responses = mutableListOf<InversePerpetualTradeHistoryResponse>()
         var page = 1
@@ -79,7 +65,7 @@ object BybitDownloader : Downloader {
         return responses
     }
 
-    private suspend fun fetchUSDTPerpetualTradeHistory(): List<USDTPerpetualTradeHistoryResponse> {
+    suspend fun downloadUSDTPerpetualTradeHistory(): List<USDTPerpetualTradeHistoryResponse> {
         println("Fetching bybit USDT perpetual trade history")
         val responses = mutableListOf<USDTPerpetualTradeHistoryResponse>()
         var page = 1
@@ -101,7 +87,7 @@ object BybitDownloader : Downloader {
         return responses
     }
 
-    private suspend fun fetchSpotTradeHistory(): List<SpotTradeHistoryResponse> {
+    suspend fun downloadSpotTradeHistory(): List<SpotTradeHistoryResponse> {
         println("Fetching bybit spot trade history")
         val responses = mutableListOf<SpotTradeHistoryResponse>()
         var page = 1
@@ -121,50 +107,6 @@ object BybitDownloader : Downloader {
             delay(5000)
         }
         return responses
-    }
-
-    private fun exportWithdrawHistory(
-        response: WithdrawHistoryResponse
-    ) {
-        CsvExporter.export(
-            WithdrawHistory(
-                name = "bybit_withdraw_history",
-                lines = response.toWithdrawRecords()
-            )
-        )
-    }
-
-    private fun exportInversePerpetualTradeHistory(
-        responses: List<InversePerpetualTradeHistoryResponse>
-    ) {
-        CsvExporter.export(
-            TradeHistory(
-                name = "bybit_inverse_perpetual_trade_history",
-                lines = responses.flatMap { it.toTradeRecords() }
-            )
-        )
-    }
-
-    private fun exportUSDTPerpetualTradeHistory(
-        responses: List<USDTPerpetualTradeHistoryResponse>
-    ) {
-        CsvExporter.export(
-            TradeHistory(
-                name = "bybit_usdt_perpetual_trade_history",
-                lines = responses.flatMap { it.toTradeRecords() }
-            )
-        )
-    }
-
-    private fun exportSpotTradeHistory(
-        responses: List<SpotTradeHistoryResponse>
-    ) {
-        CsvExporter.export(
-            TradeHistory(
-                name = "bybit_spot_trade_history",
-                lines = responses.flatMap { it.toTradeRecords() }
-            )
-        )
     }
 
 }
