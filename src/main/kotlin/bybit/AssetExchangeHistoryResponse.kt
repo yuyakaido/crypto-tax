@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import java.math.BigDecimal
 
 @Serializable
-data class AssetExchangeRecordResponse(
+data class AssetExchangeHistoryResponse(
     @SerialName("result") val results: List<Result>
 ) {
     @Serializable

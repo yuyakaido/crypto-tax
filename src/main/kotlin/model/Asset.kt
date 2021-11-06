@@ -3,9 +3,12 @@ package model
 enum class Asset {
     BTC,
     XRP,
+    DOT,
     BIT,
+    CBX,
     USD,
     USDT,
+    JPY,
     UNKNOWN;
 
     companion object {

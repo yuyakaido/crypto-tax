@@ -12,6 +12,8 @@ apply from: 'credentials.gradle'
 application {
     mainClass = 'MainKt'
     applicationDefaultJvmArgs = [
+            "-DBITFLYER_API_KEY=${BITFLYER_API_KEY}",
+            "-DBITFLYER_API_SECRET=${BITFLYER_API_SECRET}",
             "-DBYBIT_API_KEY=${BYBIT_API_KEY}",
             "-DBYBIT_API_SECRET=${BYBIT_API_SECRET}"
     ]
@@ -24,6 +26,7 @@ repositories {
 dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.2'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0'
 }

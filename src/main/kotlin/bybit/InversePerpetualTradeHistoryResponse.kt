@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonPrimitive
 import model.Asset
 import model.Side
-import model.TradeHistory
+import model.TradeRecord
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.ZoneId
@@ -29,15 +29,15 @@ data class InversePerpetualTradeHistoryResponse(
             @SerialName("exec_fee") val execFee: String
         )
     }
-    fun toTradeHistories(): List<TradeHistory> {
+    fun toTradeRecords(): List<TradeRecord> {
         return result.tradeList
             .map { trade ->
-                TradeHistory(
+                TradeRecord(
                     tradedAt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(trade.tradeTimeMs), ZoneId.systemDefault()),
                     pair = Asset.pair(trade.symbol),
                     side = Side.from(trade.side),
                     price = BigDecimal(trade.execPrice),
-                    qty = BigDecimal(trade.execQty.content),
+                    amount = BigDecimal(trade.execQty.content),
                     feeQty = BigDecimal(trade.execFee),
                     feeAsset = Asset.first(trade.symbol)
                 )

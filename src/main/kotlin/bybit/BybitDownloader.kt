@@ -2,14 +2,12 @@ package bybit
 
 import common.Downloader
 import common.RetrofitCreator
+import csv.CsvExporter
+import csv.TradeHistory
+import csv.WithdrawHistory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
-import model.TradeHistory
-import model.WithdrawRecord
-import java.io.File
-import javax.crypto.Mac
-import javax.crypto.spec.SecretKeySpec
 
 @ExperimentalSerializationApi
 object BybitDownloader : Downloader {
@@ -22,14 +20,14 @@ object BybitDownloader : Downloader {
 
     override fun execute() {
         runBlocking {
-//            val withdraw = client.getWithdrawRecords(generateQueries())
-//            outputWithdrawRecord(withdraw)
+//            val withdraw = client.getWithdrawHistory(generateQueries())
+//            exportWithdrawHistory(withdraw)
 //            val inverse = fetchInversePerpetualTradeHistory()
-//            outputInversePerpetualTradeHistory(inverse)
+//            exportInversePerpetualTradeHistory(inverse)
 //            val usdt = fetchUSDTPerpetualTradeHistory()
-//            outputUSDTPerpetualTradeHistory(usdt)
-//            val spotTrade = client.getSpotTradeHistory(generateQueries())
-//            outputSpotTradeHistory(spotTrade)
+//            exportUSDTPerpetualTradeHistory(usdt)
+//            val spot = fetchSpotTradeHistory()
+//            exportSpotTradeHistory(spot)
         }
     }
 
@@ -54,14 +52,8 @@ object BybitDownloader : Downloader {
                 }
             }
         }
-
-        val algorithm = "HmacSHA256"
-        val mac = Mac.getInstance(algorithm)
-        mac.init(SecretKeySpec(apiSecret.toByteArray(), algorithm))
-        val sign = mac.doFinal(queryString.toByteArray()).joinToString("") { String.format("%02x", it) }
-
         return queryMap.plus(
-            "sign" to sign
+            "sign" to BybitSigner.generateSignature(apiKey, apiSecret, queryString)
         )
     }
 
@@ -77,9 +69,9 @@ object BybitDownloader : Downloader {
                     "page" to page++.toString()
                 )
             )
-            val future = client.getInversePerpetualTradeHistory(queries)
-            responses.add(future)
-            if (future.result.tradeList.size < 50) {
+            val response = client.getInversePerpetualTradeHistory(queries)
+            responses.add(response)
+            if (response.result.tradeList.size < 50) {
                 break
             }
             delay(5000)
@@ -99,9 +91,9 @@ object BybitDownloader : Downloader {
                     "page" to page++.toString()
                 )
             )
-            val future = client.getUSDTPerpetualTradeHistory(queries)
-            responses.add(future)
-            if (future.result.data.size < 50) {
+            val response = client.getUSDTPerpetualTradeHistory(queries)
+            responses.add(response)
+            if (response.result.data.size < 50) {
                 break
             }
             delay(5000)
@@ -109,72 +101,70 @@ object BybitDownloader : Downloader {
         return responses
     }
 
-    private fun outputWithdrawRecord(
-        response: WithdrawRecordResponse
+    private suspend fun fetchSpotTradeHistory(): List<SpotTradeHistoryResponse> {
+        println("Fetching bybit spot trade history")
+        val responses = mutableListOf<SpotTradeHistoryResponse>()
+        var page = 1
+        while (true) {
+            println("Page = $page")
+            val queries = generateQueries(
+                parameters = mapOf(
+                    "symbol" to "DOTUSDT",
+                    "page" to page++.toString()
+                )
+            )
+            val response = client.getSpotTradeHistory(queries)
+            responses.add(response)
+            if (response.result.size < 50) {
+                break
+            }
+            delay(5000)
+        }
+        return responses
+    }
+
+    private fun exportWithdrawHistory(
+        response: WithdrawHistoryResponse
     ) {
-        outputWithdrawRecord(
-            outputFileName = "bybit_withdraw_record",
-            records = response.toWithdrawRecords()
+        CsvExporter.export(
+            WithdrawHistory(
+                name = "bybit_withdraw_history",
+                lines = response.toWithdrawRecords()
+            )
         )
     }
 
-    private fun outputInversePerpetualTradeHistory(
+    private fun exportInversePerpetualTradeHistory(
         responses: List<InversePerpetualTradeHistoryResponse>
     ) {
-        outputTradeHistory(
-            outputFileName = "bybit_inverse_perpetual_trade_history",
-            histories = responses.flatMap { it.toTradeHistories() }
+        CsvExporter.export(
+            TradeHistory(
+                name = "bybit_inverse_perpetual_trade_history",
+                lines = responses.flatMap { it.toTradeRecords() }
+            )
         )
     }
 
-    private fun outputUSDTPerpetualTradeHistory(
+    private fun exportUSDTPerpetualTradeHistory(
         responses: List<USDTPerpetualTradeHistoryResponse>
     ) {
-        outputTradeHistory(
-            outputFileName = "bybit_usdt_perpetual_trade_history",
-            histories = responses.flatMap { it.toTradeHistories() }
+        CsvExporter.export(
+            TradeHistory(
+                name = "bybit_usdt_perpetual_trade_history",
+                lines = responses.flatMap { it.toTradeRecords() }
+            )
         )
     }
 
-    private fun outputSpotTradeHistory(
-        response: SpotTradeHistoryResponse
+    private fun exportSpotTradeHistory(
+        responses: List<SpotTradeHistoryResponse>
     ) {
-        outputTradeHistory(
-            outputFileName = "bybit_spot_trade_history",
-            histories = response.toTradeHistories()
+        CsvExporter.export(
+            TradeHistory(
+                name = "bybit_spot_trade_history",
+                lines = responses.flatMap { it.toTradeRecords() }
+            )
         )
-    }
-
-    private fun outputWithdrawRecord(
-        outputFileName: String,
-        records: List<WithdrawRecord>
-    ) {
-        val outputDirectory = File("${System.getProperty("user.dir")}/build/outputs")
-        outputDirectory.mkdir()
-        val outputFile = File("${outputDirectory.path}/$outputFileName.csv")
-        outputFile.createNewFile()
-        outputFile.bufferedWriter().apply {
-            appendLine(WithdrawRecord.CSV_HEADER)
-            records.forEach { history ->
-                appendLine(history.toCSV())
-            }
-        }.close()
-    }
-
-    private fun outputTradeHistory(
-        outputFileName: String,
-        histories: List<TradeHistory>
-    ) {
-        val outputDirectory = File("${System.getProperty("user.dir")}/build/outputs")
-        outputDirectory.mkdir()
-        val outputFile = File("${outputDirectory.path}/$outputFileName.csv")
-        outputFile.createNewFile()
-        outputFile.bufferedWriter().apply {
-            appendLine(TradeHistory.CSV_HEADER)
-            histories.forEach { history ->
-                appendLine(history.toCSV())
-            }
-        }.close()
     }
 
 }

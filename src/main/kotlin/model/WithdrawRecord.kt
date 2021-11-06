@@ -1,5 +1,6 @@
 package model
 
+import csv.ExportableAsCsvLine
 import java.math.BigDecimal
 import java.time.ZonedDateTime
 
@@ -8,11 +9,6 @@ data class WithdrawRecord(
     val asset: Asset,
     val amount: BigDecimal,
     val fee: BigDecimal
-) {
-    companion object {
-        const val CSV_HEADER = "WithdrawnAt,model.Asset,Amount,Fee"
-    }
-    fun toCSV(): String {
-        return "$withdrawnAt,$asset,$amount,$fee"
-    }
+) : ExportableAsCsvLine {
+    override val csv: String = "$withdrawnAt,$asset,$amount,$fee"
 }

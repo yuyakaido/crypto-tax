@@ -8,7 +8,7 @@ import java.math.BigDecimal
 import java.time.ZonedDateTime
 
 @Serializable
-data class WithdrawRecordResponse(
+data class WithdrawHistoryResponse(
     @SerialName("result") val result: Result
 ) {
     @Serializable
@@ -25,13 +25,14 @@ data class WithdrawRecordResponse(
         )
     }
     fun toWithdrawRecords(): List<WithdrawRecord> {
-        return result.data.map { d ->
-            WithdrawRecord(
-                withdrawnAt = ZonedDateTime.parse(d.updatedAt),
-                asset = Asset.single(d.coin),
-                amount = BigDecimal(d.amount),
-                fee = BigDecimal(d.fee)
-            )
-        }
+        return result.data
+            .map { d ->
+                WithdrawRecord(
+                    withdrawnAt = ZonedDateTime.parse(d.updatedAt),
+                    asset = Asset.single(d.coin),
+                    amount = BigDecimal(d.amount),
+                    fee = BigDecimal(d.fee)
+                )
+            }
     }
 }

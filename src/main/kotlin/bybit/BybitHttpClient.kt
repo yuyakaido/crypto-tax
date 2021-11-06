@@ -5,14 +5,14 @@ import retrofit2.http.QueryMap
 
 interface BybitHttpClient {
     @GET("/v2/private/wallet/withdraw/list")
-    suspend fun getWithdrawRecords(
+    suspend fun getWithdrawHistory(
         @QueryMap queries: Map<String, String>
-    ): WithdrawRecordResponse
+    ): WithdrawHistoryResponse
 
     @GET("/v2/private/exchange-order/list")
-    suspend fun getAssetExchangeRecord(
+    suspend fun getAssetExchangeHistory(
         @QueryMap queries: Map<String, String>
-    ): AssetExchangeRecordResponse
+    ): AssetExchangeHistoryResponse
 
     @GET("/v2/private/execution/list")
     suspend fun getInversePerpetualTradeHistory(

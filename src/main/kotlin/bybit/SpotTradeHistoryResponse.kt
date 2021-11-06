@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import model.Asset
 import model.Side
-import model.TradeHistory
+import model.TradeRecord
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.ZoneId
@@ -12,7 +12,7 @@ import java.time.ZonedDateTime
 
 @Serializable
 data class SpotTradeHistoryResponse(
-    @SerialName("result") val results: List<Result>
+    @SerialName("result") val result: List<Result>
 ) {
     @Serializable
     data class Result(
@@ -25,15 +25,15 @@ data class SpotTradeHistoryResponse(
         @SerialName("commission") val commission: String,
         @SerialName("commissionAsset") val commissionAsset: String
     )
-    fun toTradeHistories(): List<TradeHistory> {
-        return results
+    fun toTradeRecords(): List<TradeRecord> {
+        return result
             .map { result ->
-                TradeHistory(
+                TradeRecord(
                     tradedAt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(result.time.toLong()), ZoneId.systemDefault()),
                     pair = Asset.pair(result.symbol),
                     side = if (result.isBuyer) { Side.Buy } else { Side.Sell },
                     price = BigDecimal(result.price),
-                    qty = BigDecimal(result.qty),
+                    amount = BigDecimal(result.qty),
                     feeQty = BigDecimal(result.commission),
                     feeAsset = Asset.single(result.commissionAsset)
                 )
