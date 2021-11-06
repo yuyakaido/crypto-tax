@@ -7,14 +7,12 @@ import kotlinx.serialization.ExperimentalSerializationApi
 object BitflyerService : Service {
 
     override suspend fun execute() {
-//        val fiatDeposit = BitflyerDownloader.client.getFiatDepositHistory()
-//        BitflyerExporter.exportFiatDepositHistory(fiatDeposit)
-//        val fiatWithdraw = BitflyerDownloader.client.getFiatWithdrawHistory()
-//        BitflyerExporter.exportFiatWithdrawHistory(fiatWithdraw)
-//        val coinDeposit = BitflyerDownloader.client.getCoinDepositHistory()
-//        BitflyerExporter.exportCoinDepositHistory(coinDeposit)
-//        val coinWithdraw = BitflyerDownloader.client.getCoinWithdrawHistory()
-//        BitflyerExporter.exportCoinWithdrawHistory(coinWithdraw)
+        val fiatDeposit = BitflyerDownloader.client.getFiatDepositHistory().map { it.toDepositRecord() }
+        val coinDeposit = BitflyerDownloader.client.getCoinDepositHistory().map { it.toDepositRecord() }
+        BitflyerExporter.exportDepositHistory(fiatDeposit + coinDeposit)
+        val fiatWithdraw = BitflyerDownloader.client.getFiatWithdrawHistory().map { it.toWithdrawRecord() }
+        val coinWithdraw = BitflyerDownloader.client.getCoinWithdrawHistory().map { it.toWithdrawRecord() }
+        BitflyerExporter.exportWithdrawHistory(fiatWithdraw + coinWithdraw)
         val trade = BitflyerImporter.importTradeRecords()
         BitflyerExporter.exportTradeHistory(trade)
     }

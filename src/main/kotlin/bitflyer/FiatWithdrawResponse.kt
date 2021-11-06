@@ -23,7 +23,7 @@ data class FiatWithdrawResponse(
             withdrawnAt = LocalDateTime.parse(eventDate).atZone(ZoneOffset.UTC.normalized()),
             asset = Asset.single(currencyCode),
             amount = amount,
-            fee = BigDecimal.ZERO
+            fee = BigDecimal(770) // https://bitflyer.com/en-jp/commission
         )
     }
 }
