@@ -4,13 +4,13 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import model.Asset
-import model.DepositRecord
+import model.FiatDepositRecord
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 @Serializable
-data class DepositResponse(
+data class FiatDepositResponse(
     @SerialName("id") val id: Long,
     @SerialName("order_id") val orderId: String,
     @SerialName("currency_code") val currencyCode: String,
@@ -18,9 +18,8 @@ data class DepositResponse(
     @SerialName("status") val status: String,
     @SerialName("event_date") val eventDate: String
 ) {
-    fun toDepositRecord(): DepositRecord {
-        println(LocalDateTime.parse(eventDate).atZone(ZoneOffset.UTC.normalized()))
-        return DepositRecord(
+    fun toFiatDepositRecord(): FiatDepositRecord {
+        return FiatDepositRecord(
             depositedAt = LocalDateTime.parse(eventDate).atZone(ZoneOffset.UTC.normalized()),
             asset = Asset.single(currencyCode),
             amount = amount

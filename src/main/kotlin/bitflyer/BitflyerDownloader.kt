@@ -3,7 +3,8 @@ package bitflyer
 import common.Downloader
 import common.RetrofitCreator
 import csv.CsvExporter
-import csv.DepositHistory
+import csv.FiatDepositHistory
+import csv.FiatWithdrawHistory
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 
@@ -21,16 +22,27 @@ object BitflyerDownloader : Downloader {
 
     override fun execute() {
         runBlocking {
-            val deposit = client.getDepositHistory()
-            exportDepositHistory(deposit)
+            val deposit = client.getFiatDepositHistory()
+            exportFiatDepositHistory(deposit)
+            val withdraw = client.getFiatWithdrawHistory()
+            exportFiatWithdrawHistory(withdraw)
         }
     }
 
-    private fun exportDepositHistory(responses: List<DepositResponse>) {
+    private fun exportFiatDepositHistory(responses: List<FiatDepositResponse>) {
         CsvExporter.export(
-            DepositHistory(
-                name = "bitflyer_deposit_history",
-                lines = responses.map { it.toDepositRecord() }
+            FiatDepositHistory(
+                name = "bitflyer_fiat_deposit_history",
+                lines = responses.map { it.toFiatDepositRecord() }
+            )
+        )
+    }
+
+    private fun exportFiatWithdrawHistory(responses: List<FiatWithdrawResponse>) {
+        CsvExporter.export(
+            FiatWithdrawHistory(
+                name = "bitflyer_fiat_withdraw_history",
+                lines = responses.map { it.toFiatWithdrawRecord() }
             )
         )
     }
