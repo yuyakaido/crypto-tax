@@ -3,8 +3,8 @@ package bitflyer
 import common.Downloader
 import common.RetrofitCreator
 import csv.CsvExporter
-import csv.FiatDepositHistory
-import csv.FiatWithdrawHistory
+import csv.DepositHistory
+import csv.WithdrawHistory
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 
@@ -28,12 +28,14 @@ object BitflyerDownloader : Downloader {
             exportFiatWithdrawHistory(fiatWithdraw)
             val coinDeposit = client.getCoinDepositHistory()
             exportCoinDepositHistory(coinDeposit)
+            val coinWithdraw = client.getCoinWithdrawHistory()
+            exportCoinWithdrawHistory(coinWithdraw)
         }
     }
 
     private fun exportFiatDepositHistory(responses: List<FiatDepositResponse>) {
         CsvExporter.export(
-            FiatDepositHistory(
+            DepositHistory(
                 name = "bitflyer_fiat_deposit_history",
                 lines = responses.map { it.toFiatDepositRecord() }
             )
@@ -42,7 +44,7 @@ object BitflyerDownloader : Downloader {
 
     private fun exportFiatWithdrawHistory(responses: List<FiatWithdrawResponse>) {
         CsvExporter.export(
-            FiatWithdrawHistory(
+            WithdrawHistory(
                 name = "bitflyer_fiat_withdraw_history",
                 lines = responses.map { it.toFiatWithdrawRecord() }
             )
@@ -51,9 +53,18 @@ object BitflyerDownloader : Downloader {
 
     private fun exportCoinDepositHistory(responses: List<CoinDepositResponse>) {
         CsvExporter.export(
-            FiatWithdrawHistory(
+            DepositHistory(
                 name = "bitflyer_coin_deposit_history",
                 lines = responses.map { it.toCoinDepositRecord() }
+            )
+        )
+    }
+
+    private fun exportCoinWithdrawHistory(responses: List<CoinWithdrawResponse>) {
+        CsvExporter.export(
+            WithdrawHistory(
+                name = "bitflyer_coin_withdraw_history",
+                lines = responses.map { it.toCoinWithdrawRecord() }
             )
         )
     }
