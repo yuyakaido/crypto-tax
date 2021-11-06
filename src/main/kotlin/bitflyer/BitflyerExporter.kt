@@ -2,8 +2,10 @@ package bitflyer
 
 import csv.CsvExporter
 import csv.DepositHistory
+import csv.TradeHistory
 import csv.WithdrawHistory
 import model.DepositRecord
+import model.TradeRecord
 import model.WithdrawRecord
 
 object BitflyerExporter {
@@ -21,6 +23,15 @@ object BitflyerExporter {
         CsvExporter.export(
             WithdrawHistory(
                 name = "bitflyer_withdraw_history",
+                lines = records
+            )
+        )
+    }
+
+    fun exportTradeHistory(records: List<TradeRecord>) {
+        CsvExporter.export(
+            TradeHistory(
+                name = "bitflyer_trade_history",
                 lines = records
             )
         )

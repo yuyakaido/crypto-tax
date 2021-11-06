@@ -36,9 +36,9 @@ data class USDTPerpetualTradeHistoryResponse(
                     tradedAt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(trade.tradeTimeMs), ZoneId.systemDefault()),
                     pair = Asset.pair(trade.symbol),
                     side = Side.from(trade.side),
-                    price = BigDecimal(trade.execPrice.content),
-                    amount = BigDecimal(trade.execQty.content),
-                    feeQty = BigDecimal(trade.execFee.content),
+                    tradePrice = BigDecimal(trade.execPrice.content),
+                    tradeAmount = BigDecimal(trade.execQty.content),
+                    feeAmount = BigDecimal(trade.execFee.content),
                     feeAsset = Asset.second(trade.symbol)
                 )
             }

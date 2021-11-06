@@ -32,9 +32,9 @@ data class SpotTradeHistoryResponse(
                     tradedAt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(result.time.toLong()), ZoneId.systemDefault()),
                     pair = Asset.pair(result.symbol),
                     side = if (result.isBuyer) { Side.Buy } else { Side.Sell },
-                    price = BigDecimal(result.price),
-                    amount = BigDecimal(result.qty),
-                    feeQty = BigDecimal(result.commission),
+                    tradePrice = BigDecimal(result.price),
+                    tradeAmount = BigDecimal(result.qty),
+                    feeAmount = BigDecimal(result.commission),
                     feeAsset = Asset.single(result.commissionAsset)
                 )
             }

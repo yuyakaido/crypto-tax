@@ -36,9 +36,9 @@ data class InversePerpetualTradeHistoryResponse(
                     tradedAt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(trade.tradeTimeMs), ZoneId.systemDefault()),
                     pair = Asset.pair(trade.symbol),
                     side = Side.from(trade.side),
-                    price = BigDecimal(trade.execPrice),
-                    amount = BigDecimal(trade.execQty.content),
-                    feeQty = BigDecimal(trade.execFee),
+                    tradePrice = BigDecimal(trade.execPrice),
+                    tradeAmount = BigDecimal(trade.execQty.content),
+                    feeAmount = BigDecimal(trade.execFee),
                     feeAsset = Asset.first(trade.symbol)
                 )
             }

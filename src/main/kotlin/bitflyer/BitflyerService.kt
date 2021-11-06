@@ -15,8 +15,8 @@ object BitflyerService : Service {
 //        BitflyerExporter.exportCoinDepositHistory(coinDeposit)
 //        val coinWithdraw = BitflyerDownloader.client.getCoinWithdrawHistory()
 //        BitflyerExporter.exportCoinWithdrawHistory(coinWithdraw)
-        val deposit = BitflyerImporter.importDepositRecords()
-        BitflyerExporter.exportDepositHistory(deposit)
+        val trade = BitflyerImporter.importTradeRecords()
+        BitflyerExporter.exportTradeHistory(trade)
     }
 
 }

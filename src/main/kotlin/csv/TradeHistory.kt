@@ -6,5 +6,5 @@ data class TradeHistory(
     override val name: String,
     override val lines: List<TradeRecord>
 ) : ExportableAsCsvFile {
-    override val header: String = "TradedAt,Pair,Side,Price,Qty,FeeQty,FeeAsset"
+    override val header: String = "TradedAt,Pair,Side,TradePrice,TradeAmount,FeeAmount,FeeAsset"
 }

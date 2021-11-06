@@ -6,6 +6,7 @@ enum class Asset {
     DOT,
     BIT,
     CBX,
+    MONA,
     USD,
     USDT,
     JPY,

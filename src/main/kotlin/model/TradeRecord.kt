@@ -8,10 +8,10 @@ data class TradeRecord(
     val tradedAt: ZonedDateTime,
     val pair: Pair<Asset, Asset>,
     val side: Side,
-    val price: BigDecimal,
-    val amount: BigDecimal,
-    val feeQty: BigDecimal,
+    val tradePrice: BigDecimal,
+    val tradeAmount: BigDecimal,
+    val feeAmount: BigDecimal,
     val feeAsset: Asset
 ) : ExportableAsCsvLine {
-    override val csv: String = "$tradedAt,${pair.first}/${pair.second},$side,$price,$amount,$feeQty,$feeAsset"
+    override val csv: String = "$tradedAt,${pair.first}/${pair.second},$side,$tradePrice,$tradeAmount,$feeAmount,$feeAsset"
 }
