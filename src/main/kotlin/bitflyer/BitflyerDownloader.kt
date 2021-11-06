@@ -22,10 +22,12 @@ object BitflyerDownloader : Downloader {
 
     override fun execute() {
         runBlocking {
-            val deposit = client.getFiatDepositHistory()
-            exportFiatDepositHistory(deposit)
-            val withdraw = client.getFiatWithdrawHistory()
-            exportFiatWithdrawHistory(withdraw)
+            val fiatDeposit = client.getFiatDepositHistory()
+            exportFiatDepositHistory(fiatDeposit)
+            val fiatWithdraw = client.getFiatWithdrawHistory()
+            exportFiatWithdrawHistory(fiatWithdraw)
+            val coinDeposit = client.getCoinDepositHistory()
+            exportCoinDepositHistory(coinDeposit)
         }
     }
 
@@ -43,6 +45,15 @@ object BitflyerDownloader : Downloader {
             FiatWithdrawHistory(
                 name = "bitflyer_fiat_withdraw_history",
                 lines = responses.map { it.toFiatWithdrawRecord() }
+            )
+        )
+    }
+
+    private fun exportCoinDepositHistory(responses: List<CoinDepositResponse>) {
+        CsvExporter.export(
+            FiatWithdrawHistory(
+                name = "bitflyer_coin_deposit_history",
+                lines = responses.map { it.toCoinDepositRecord() }
             )
         )
     }

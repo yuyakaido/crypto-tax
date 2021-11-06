@@ -4,7 +4,7 @@ import csv.ExportableAsCsvLine
 import java.math.BigDecimal
 import java.time.ZonedDateTime
 
-data class FiatDepositRecord(
+data class CoinDepositRecord(
     val depositedAt: ZonedDateTime,
     val asset: Asset,
     val amount: BigDecimal

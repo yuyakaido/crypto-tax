@@ -10,4 +10,7 @@ interface BitflyerHttpClient {
     @GET("me/getwithdrawals")
     suspend fun getFiatWithdrawHistory(): List<FiatWithdrawResponse>
 
+    @GET("me/getcoinins")
+    suspend fun getCoinDepositHistory(): List<CoinDepositResponse>
+
 }
