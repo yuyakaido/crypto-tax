@@ -1,4 +1,4 @@
-package misc
+package common
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
