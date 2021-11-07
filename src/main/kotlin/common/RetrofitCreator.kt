@@ -7,6 +7,7 @@ import kotlinx.serialization.modules.serializersModuleOf
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 
 @ExperimentalSerializationApi
@@ -16,6 +17,8 @@ object RetrofitCreator {
         ignoreUnknownKeys = true
         serializersModule = serializersModuleOf(BigDecimalSerializer)
     }
+    private val loggingInterceptor = HttpLoggingInterceptor()
+        .apply { level = HttpLoggingInterceptor.Level.BASIC }
 
     fun newInstance(
         baseUrl: String,
@@ -23,6 +26,7 @@ object RetrofitCreator {
     ): Retrofit {
         val okHttpClient = OkHttpClient.Builder()
             .apply { interceptors.forEach { interceptor -> addInterceptor(interceptor) } }
+            .addInterceptor(loggingInterceptor)
             .build()
         return Retrofit.Builder()
             .client(okHttpClient)

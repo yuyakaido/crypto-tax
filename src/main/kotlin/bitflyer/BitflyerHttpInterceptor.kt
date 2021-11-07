@@ -1,5 +1,6 @@
 package bitflyer
 
+import common.Signer
 import okhttp3.Headers.Companion.toHeaders
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -19,7 +20,7 @@ class BitflyerHttpInterceptor(
         val headers = mapOf(
             "ACCESS-KEY" to apiKey,
             "ACCESS-TIMESTAMP" to timestamp.toString(),
-            "ACCESS-SIGN" to BitflyerSigner.generateSignature(
+            "ACCESS-SIGN" to Signer.generateSignature(
                 apiKey = apiKey,
                 apiSecret = apiSecret,
                 target = target

@@ -13,8 +13,8 @@ object BitflyerService : Service {
 //        val fiatWithdraw = BitflyerDownloader.client.getFiatWithdrawHistory().map { it.toWithdrawRecord() }
 //        val coinWithdraw = BitflyerDownloader.client.getCoinWithdrawHistory().map { it.toWithdrawRecord() }
 //        BitflyerExporter.exportWithdrawHistory(fiatWithdraw + coinWithdraw)
-        val trade = BitflyerImporter.importTradeRecords()
-        BitflyerExporter.exportTradeHistory(trade)
+//        val trade = BitflyerImporter.importTradeRecords()
+//        BitflyerExporter.exportTradeHistory(trade)
     }
 
 }
