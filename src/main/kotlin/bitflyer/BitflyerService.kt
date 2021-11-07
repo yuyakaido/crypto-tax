@@ -1,20 +1,37 @@
 package bitflyer
 
 import common.Service
+import csv.CsvExporter
+import csv.DepositHistory
+import csv.TradeHistory
+import csv.WithdrawHistory
 import kotlinx.serialization.ExperimentalSerializationApi
 
 @ExperimentalSerializationApi
 object BitflyerService : Service {
 
     override suspend fun execute() {
-//        val fiatDeposit = BitflyerDownloader.client.getFiatDepositHistory().map { it.toDepositRecord() }
-//        val coinDeposit = BitflyerDownloader.client.getCoinDepositHistory().map { it.toDepositRecord() }
-//        BitflyerExporter.exportDepositHistory(fiatDeposit + coinDeposit)
-//        val fiatWithdraw = BitflyerDownloader.client.getFiatWithdrawHistory().map { it.toWithdrawRecord() }
-//        val coinWithdraw = BitflyerDownloader.client.getCoinWithdrawHistory().map { it.toWithdrawRecord() }
-//        BitflyerExporter.exportWithdrawHistory(fiatWithdraw + coinWithdraw)
-//        val trade = BitflyerImporter.importTradeRecords()
-//        BitflyerExporter.exportTradeHistory(trade)
+//        val depositRecords = BitflyerDownloader.downloadDepositRecords()
+//        CsvExporter.export(
+//            DepositHistory(
+//                name = "bitflyer_deposit_history",
+//                lines = depositRecords
+//            )
+//        )
+//        val withdrawRecords = BitflyerDownloader.downloadWithdrawRecords()
+//        CsvExporter.export(
+//            WithdrawHistory(
+//                name = "bitfyer_withdraw_history",
+//                lines = withdrawRecords
+//            )
+//        )
+//        val tradeRecords = BitflyerImporter.importTradeRecords()
+//        CsvExporter.export(
+//            TradeHistory(
+//                name = "bitflyer_trade_history",
+//                lines = tradeRecords
+//            )
+//        )
     }
 
 }

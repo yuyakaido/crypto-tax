@@ -4,6 +4,8 @@ import common.RetrofitCreator
 import common.Signer
 import kotlinx.coroutines.delay
 import kotlinx.serialization.ExperimentalSerializationApi
+import model.TradeRecord
+import model.WithdrawRecord
 
 @ExperimentalSerializationApi
 object BybitDownloader {
@@ -40,11 +42,11 @@ object BybitDownloader {
         )
     }
 
-    suspend fun downloadWithdrawHistory(): WithdrawHistoryResponse {
-        return client.getWithdrawHistory(generateQueries())
+    suspend fun downloadWithdrawRecords(): List<WithdrawRecord> {
+        return client.getWithdrawHistory(generateQueries()).toWithdrawRecords()
     }
 
-    suspend fun downloadInversePerpetualTradeHistory(): List<InversePerpetualTradeHistoryResponse> {
+    suspend fun downloadInversePerpetualTradeRecords(): List<TradeRecord> {
         println("Fetching bybit inverse perpetual trade history")
         val responses = mutableListOf<InversePerpetualTradeHistoryResponse>()
         var page = 1
@@ -63,10 +65,10 @@ object BybitDownloader {
             }
             delay(5000)
         }
-        return responses
+        return responses.flatMap { it.toTradeRecords() }
     }
 
-    suspend fun downloadUSDTPerpetualTradeHistory(): List<USDTPerpetualTradeHistoryResponse> {
+    suspend fun downloadUSDTPerpetualTradeRecords(): List<TradeRecord> {
         println("Fetching bybit USDT perpetual trade history")
         val responses = mutableListOf<USDTPerpetualTradeHistoryResponse>()
         var page = 1
@@ -85,10 +87,10 @@ object BybitDownloader {
             }
             delay(5000)
         }
-        return responses
+        return responses.flatMap { it.toTradeRecords() }
     }
 
-    suspend fun downloadSpotTradeHistory(): List<SpotTradeHistoryResponse> {
+    suspend fun downloadSpotTradeRecords(): List<TradeRecord> {
         println("Fetching bybit spot trade history")
         val responses = mutableListOf<SpotTradeHistoryResponse>()
         var page = 1
@@ -107,7 +109,7 @@ object BybitDownloader {
             }
             delay(5000)
         }
-        return responses
+        return responses.flatMap { it.toTradeRecords() }
     }
 
 }
