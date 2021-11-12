@@ -1,7 +1,7 @@
 package bybit
 
 import common.RetrofitCreator
-import common.Signer
+import common.Security
 import kotlinx.coroutines.delay
 import kotlinx.serialization.ExperimentalSerializationApi
 import model.TradeRecord
@@ -38,7 +38,7 @@ object BybitDownloader {
             }
         }
         return queryMap.plus(
-            "sign" to Signer.generateSignature(apiKey, apiSecret, queryString)
+            "sign" to Security.generateSignature(apiSecret, queryString)
         )
     }
 

@@ -29,7 +29,7 @@ object PoloniexDownloader {
     }
 
     suspend fun downloadTradeRecords(): List<TradeRecord> {
-        val response = client.getTradeRecords()
+        val response = client.getTradeHistory()
         return response.entries
             .flatMap { entry ->
                 val pair = Asset.poloniex(entry.key)

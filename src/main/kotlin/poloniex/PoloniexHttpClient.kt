@@ -20,7 +20,7 @@ interface PoloniexHttpClient {
 
     @FormUrlEncoded
     @POST("tradingApi")
-    suspend fun getTradeRecords(
+    suspend fun getTradeHistory(
         @Field("command") command: String = "returnTradeHistory",
         @Field("nonce") nonce: Long = Instant.now().toEpochMilli(),
         @Field("currencyPair") currencyPair: String = "all",

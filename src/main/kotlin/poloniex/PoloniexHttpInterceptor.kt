@@ -1,6 +1,6 @@
 package poloniex
 
-import common.Signer
+import common.Security
 import okhttp3.FormBody
 import okhttp3.Headers.Companion.toHeaders
 import okhttp3.Interceptor
@@ -25,11 +25,10 @@ class PoloniexHttpInterceptor(
             }
             val headers = mapOf(
                 "Key" to apiKey,
-                "Sign" to Signer.generateSignature(
-                    apiKey = apiKey,
+                "Sign" to Security.generateSignature(
                     apiSecret = apiSecret,
                     target = builder.toString(),
-                    algorithm = Signer.Algorithm.HMAC_SHA_512
+                    algorithm = Security.SignatureAlgorithm.HMAC_SHA_512
                 )
             )
             val newRequest = chain.request()
