@@ -3,6 +3,7 @@ package bittrex
 import common.Service
 import csv.CsvExporter
 import csv.DepositHistory
+import csv.TradeHistory
 import csv.WithdrawHistory
 import kotlinx.serialization.ExperimentalSerializationApi
 
@@ -10,18 +11,25 @@ import kotlinx.serialization.ExperimentalSerializationApi
 object BittrexService : Service {
 
     override suspend fun execute() {
-        val depositRecords = BittrexDownloader.downloadDepositRecords()
+//        val depositRecords = BittrexDownloader.downloadDepositRecords()
+//        CsvExporter.export(
+//            DepositHistory(
+//                name = "bittrex_deposit_history",
+//                lines = depositRecords
+//            )
+//        )
+//        val withdrawRecords = BittrexDownloader.downloadWithdrawRecords()
+//        CsvExporter.export(
+//            WithdrawHistory(
+//                name = "bittrex_withdraw_history",
+//                lines = withdrawRecords
+//            )
+//        )
+        val tradeRecords = BittrexDownloader.downloadTradeHistory()
         CsvExporter.export(
-            DepositHistory(
-                name = "bittrex_deposit_history",
-                lines = depositRecords
-            )
-        )
-        val withdrawRecords = BittrexDownloader.downloadWithdrawRecords()
-        CsvExporter.export(
-            WithdrawHistory(
-                name = "bittrex_withdraw_history",
-                lines = withdrawRecords
+            TradeHistory(
+                name = "bittrex_trade_history",
+                lines = tradeRecords
             )
         )
     }

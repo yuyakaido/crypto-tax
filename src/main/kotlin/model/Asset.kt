@@ -9,10 +9,12 @@ data class Asset(val value: String) {
             return symbol
                 .replace("/", "") // For bitFlyer (BTC/JPY)
                 .replace("_", "") // For Poloniex (USDT_BTC)
+                .replace("-", "") // For Bittrex (BTC-USDT)
         }
 
         /**
-         * This method only accepts reversed symbol format of Poloniex (USDT_BTC)
+         * This method accepts the following reversed symbol format
+         *   - USDT_BTC(Poloniex)
          */
         fun poloniex(symbol: String): Pair<Asset, Asset> {
             val assets = symbol.split("_")
@@ -22,7 +24,11 @@ data class Asset(val value: String) {
         }
 
         /**
-         * This method accepts BTCUSDT or BTC/USDT or BTC_USDT
+         * This method accepts the following not reversed symbol format
+         *   - BTC/USDT(bitFlyer)
+         *   - BTC_USDT(Poloniex)
+         *   - BTC-USDT(Bittrex)
+         *   - BTCUSDT(Bybit)
          */
         fun pair(symbol: String): Pair<Asset, Asset> {
             val sanitizedSymbol = sanitize(symbol)

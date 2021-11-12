@@ -10,4 +10,7 @@ interface BittrexHttpClient {
     @GET("withdrawals/closed")
     suspend fun getWithdrawHistory(): List<WithdrawResponse>
 
+    @GET("orders/closed")
+    suspend fun getTradeHistory(): List<TradeResponse>
+
 }
