@@ -10,6 +10,7 @@ data class Asset(val value: String) {
                 .replace("/", "") // For bitFlyer (BTC/JPY)
                 .replace("_", "") // For Poloniex (USDT_BTC)
                 .replace("-", "") // For Bittrex (BTC-USDT)
+                .uppercase()
         }
 
         /**
@@ -26,6 +27,7 @@ data class Asset(val value: String) {
         /**
          * This method accepts the following not reversed symbol format
          *   - BTC/USDT(bitFlyer)
+         *   - btc_jpy(bitbank)
          *   - BTC_USDT(Poloniex)
          *   - BTC-USDT(Bittrex)
          *   - BTCUSDT(Bybit)

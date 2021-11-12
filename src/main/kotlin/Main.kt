@@ -1,3 +1,4 @@
+import bitbank.BitbankService
 import bitflyer.BitflyerService
 import bittrex.BittrexService
 import bybit.BybitService
@@ -11,6 +12,7 @@ fun main() {
     runBlocking {
         println("Started!")
         BitflyerService.execute()
+        BitbankService.execute()
         PoloniexService.execute()
         BittrexService.execute()
         BybitService.execute()

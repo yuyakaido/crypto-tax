@@ -25,13 +25,13 @@ object BittrexService : Service {
 //                lines = withdrawRecords
 //            )
 //        )
-        val tradeRecords = BittrexDownloader.downloadTradeHistory()
-        CsvExporter.export(
-            TradeHistory(
-                name = "bittrex_trade_history",
-                lines = tradeRecords
-            )
-        )
+//        val tradeRecords = BittrexDownloader.downloadTradeHistory()
+//        CsvExporter.export(
+//            TradeHistory(
+//                name = "bittrex_trade_history",
+//                lines = tradeRecords
+//            )
+//        )
     }
 
 }
