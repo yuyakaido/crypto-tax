@@ -18,7 +18,7 @@ object RetrofitCreator {
         serializersModule = serializersModuleOf(BigDecimalSerializer)
     }
     private val loggingInterceptor = HttpLoggingInterceptor()
-        .apply { level = HttpLoggingInterceptor.Level.BASIC }
+        .apply { level = HttpLoggingInterceptor.Level.NONE }
 
     fun newInstance(
         baseUrl: String,
@@ -33,6 +33,10 @@ object RetrofitCreator {
             .baseUrl(baseUrl)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
+    }
+
+    fun getJson(): Json {
+        return json
     }
 
 }

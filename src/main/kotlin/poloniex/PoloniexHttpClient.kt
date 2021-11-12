@@ -1,5 +1,6 @@
 package poloniex
 
+import kotlinx.serialization.json.JsonObject
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
@@ -16,5 +17,15 @@ interface PoloniexHttpClient {
         @Field("start") start: Long = ZonedDateTime.now().minusYears(100).toEpochSecond(),
         @Field("end") end: Long = ZonedDateTime.now().toEpochSecond()
     ): DepositWithdrawHistoryResponse
+
+    @FormUrlEncoded
+    @POST("tradingApi")
+    suspend fun getTradeRecords(
+        @Field("command") command: String = "returnTradeHistory",
+        @Field("nonce") nonce: Long = Instant.now().toEpochMilli(),
+        @Field("currencyPair") currencyPair: String = "all",
+        @Field("start") start: Long = ZonedDateTime.now().minusYears(100).toEpochSecond(),
+        @Field("end") end: Long = ZonedDateTime.now().toEpochSecond()
+    ): JsonObject
 
 }
