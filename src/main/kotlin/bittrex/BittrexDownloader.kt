@@ -3,6 +3,7 @@ package bittrex
 import common.RetrofitCreator
 import kotlinx.serialization.ExperimentalSerializationApi
 import model.DepositRecord
+import model.WithdrawRecord
 
 @ExperimentalSerializationApi
 object BittrexDownloader {
@@ -23,6 +24,10 @@ object BittrexDownloader {
 
     suspend fun downloadDepositRecords(): List<DepositRecord> {
         return client.getDepositHistory().map { it.toDepositRecord() }
+    }
+
+    suspend fun downloadWithdrawRecords(): List<WithdrawRecord> {
+        return client.getWithdrawHistory().map { it.toWithdrawRecord() }
     }
 
 }
