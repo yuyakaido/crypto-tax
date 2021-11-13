@@ -1,7 +1,6 @@
 package bybit
 
 import common.RetrofitCreator
-import common.Security
 import kotlinx.coroutines.delay
 import kotlinx.serialization.ExperimentalSerializationApi
 import model.TradeRecord
@@ -13,37 +12,19 @@ object BybitDownloader {
     private val apiKey = System.getProperty("BYBIT_API_KEY")
     private val apiSecret = System.getProperty("BYBIT_API_SECRET")
     private val client = RetrofitCreator
-        .newInstance("https://api.bybit.com/")
+        .newInstance(
+            baseUrl = "https://api.bybit.com/",
+            interceptors = listOf(
+                BybitHttpInterceptor(
+                    apiKey = apiKey,
+                    apiSecret = apiSecret
+                )
+            )
+        )
         .create(BybitHttpClient::class.java)
 
-    private fun generateQueries(
-        parameters: Map<String, String> = emptyMap()
-    ): Map<String, String> {
-        // The parameters must be ordered in alphabetical order.
-        // https://bybit-exchange.github.io/docs/inverse/#t-authentication
-        val queryMap = parameters.plus(
-            mapOf(
-                "api_key" to apiKey,
-                "timestamp" to System.currentTimeMillis().toString()
-            )
-        ).toSortedMap()
-        val queryString = buildString {
-            val iterator = queryMap.iterator()
-            while (iterator.hasNext()) {
-                val entry = iterator.next()
-                append("${entry.key}=${entry.value}")
-                if (iterator.hasNext()) {
-                    append("&")
-                }
-            }
-        }
-        return queryMap.plus(
-            "sign" to Security.generateSignature(apiSecret, queryString)
-        )
-    }
-
     suspend fun downloadWithdrawRecords(): List<WithdrawRecord> {
-        return client.getWithdrawHistory(generateQueries()).toWithdrawRecords()
+        return client.getWithdrawHistory().toWithdrawRecords()
     }
 
     suspend fun downloadInversePerpetualTradeRecords(): List<TradeRecord> {
@@ -52,13 +33,7 @@ object BybitDownloader {
         var page = 1
         while (true) {
             println("Page = $page")
-            val queries = generateQueries(
-                parameters = mapOf(
-                    "symbol" to "BTCUSD",
-                    "page" to page++.toString()
-                )
-            )
-            val response = client.getInversePerpetualTradeHistory(queries)
+            val response = client.getInversePerpetualTradeHistory(page = page++)
             responses.add(response)
             if (response.result.tradeList.size < 50) {
                 break
@@ -74,13 +49,7 @@ object BybitDownloader {
         var page = 1
         while (true) {
             println("Page = $page")
-            val queries = generateQueries(
-                parameters = mapOf(
-                    "symbol" to "BTCUSDT",
-                    "page" to page++.toString()
-                )
-            )
-            val response = client.getUSDTPerpetualTradeHistory(queries)
+            val response = client.getUSDTPerpetualTradeHistory(page = page++)
             responses.add(response)
             if (response.result.data.size < 50) {
                 break
@@ -96,13 +65,7 @@ object BybitDownloader {
         var page = 1
         while (true) {
             println("Page = $page")
-            val queries = generateQueries(
-                parameters = mapOf(
-                    "symbol" to "DOTUSDT",
-                    "page" to page++.toString()
-                )
-            )
-            val response = client.getSpotTradeHistory(queries)
+            val response = client.getSpotTradeHistory(page = page++)
             responses.add(response)
             if (response.result.size < 50) {
                 break
