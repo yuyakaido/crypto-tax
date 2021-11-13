@@ -1,6 +1,6 @@
 package model
 
-import csv.ExportableAsCsvLine
+import csv.CsvRecord
 import java.math.BigDecimal
 import java.time.ZonedDateTime
 
@@ -12,6 +12,6 @@ data class TradeRecord(
     val tradeAmount: BigDecimal,
     val feeAmount: BigDecimal,
     val feeAsset: Asset
-) : ExportableAsCsvLine {
+) : CsvRecord {
     override val csv: String = "$tradedAt,${pair.first}/${pair.second},$side,$tradePrice,$tradeAmount,$feeAmount,$feeAsset"
 }

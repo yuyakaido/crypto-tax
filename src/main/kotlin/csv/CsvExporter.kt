@@ -4,14 +4,14 @@ import java.io.File
 
 object CsvExporter {
 
-    fun export(exportable: ExportableAsCsvFile) {
+    fun export(file: CsvFile) {
         val outputDirectory = File("${System.getProperty("user.dir")}/outputs")
         outputDirectory.mkdir()
-        val outputFile = File("${outputDirectory.path}/${exportable.name}.csv")
+        val outputFile = File("${outputDirectory.path}/${file.name}.csv")
         outputFile.createNewFile()
         outputFile.bufferedWriter().apply {
-            appendLine(exportable.header)
-            exportable.lines.forEach { appendLine(it.csv) }
+            appendLine(file.header)
+            file.sortedRows.forEach { appendLine(it.csv) }
         }.close()
     }
 

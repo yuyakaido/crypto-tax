@@ -13,7 +13,7 @@ object BitbankService : Service {
 //        CsvExporter.export(
 //            TradeHistory(
 //                name = "bitbank_trade_history",
-//                lines = tradeRecords
+//                unsortedRows = tradeRecords
 //            )
 //        )
     }

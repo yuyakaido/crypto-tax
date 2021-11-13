@@ -12,26 +12,26 @@ object PoloniexService : Service {
 //        CsvExporter.export(
 //            DistributionHistory(
 //                name = "poloniex_distribution_history",
-//                lines = depositWithdrawRecords.adjustments.map { it.toDistributionRecord() }
+//                unsortedRows = depositWithdrawRecords.adjustments.map { it.toDistributionRecord() }
 //            )
 //        )
 //        CsvExporter.export(
 //            DepositHistory(
 //                name = "poloniex_deposit_history",
-//                lines = depositWithdrawRecords.deposits.map { it.toDepositRecord() }
+//                unsortedRows = depositWithdrawRecords.deposits.map { it.toDepositRecord() }
 //            )
 //        )
 //        CsvExporter.export(
 //            WithdrawHistory(
 //                name = "poloniex_withdraw_history",
-//                lines = depositWithdrawRecords.withdrawals.map { it.toWithdrawRecord() }
+//                unsortedRows = depositWithdrawRecords.withdrawals.map { it.toWithdrawRecord() }
 //            )
 //        )
 //        val tradeRecords = PoloniexDownloader.downloadTradeRecords()
 //        CsvExporter.export(
 //            TradeHistory(
 //                name = "poloniex_trade_history",
-//                lines = tradeRecords
+//                unsortedRows = tradeRecords
 //            )
 //        )
     }

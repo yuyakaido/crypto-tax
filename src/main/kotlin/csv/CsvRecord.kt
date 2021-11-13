@@ -1,5 +1,5 @@
 package csv
 
-interface ExportableAsCsvLine {
+interface CsvRecord {
     val csv: String
 }

@@ -15,21 +15,21 @@ object BitflyerService : Service {
 //        CsvExporter.export(
 //            DepositHistory(
 //                name = "bitflyer_deposit_history",
-//                lines = depositRecords
+//                unsortedRows = depositRecords
 //            )
 //        )
 //        val withdrawRecords = BitflyerDownloader.downloadWithdrawRecords()
 //        CsvExporter.export(
 //            WithdrawHistory(
-//                name = "bitfyer_withdraw_history",
-//                lines = withdrawRecords
+//                name = "bitflyer_withdraw_history",
+//                unsortedRows = withdrawRecords
 //            )
 //        )
 //        val tradeRecords = BitflyerImporter.importTradeRecords()
 //        CsvExporter.export(
 //            TradeHistory(
 //                name = "bitflyer_trade_history",
-//                lines = tradeRecords
+//                unsortedRows = tradeRecords
 //            )
 //        )
     }
