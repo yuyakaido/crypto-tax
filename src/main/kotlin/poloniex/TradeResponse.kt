@@ -5,6 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import model.Asset
 import model.Side
+import model.Symbol
 import model.TradeRecord
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -29,7 +30,7 @@ data class TradeResponse(
     fun toTradeRecord(pair: Pair<Asset, Asset>): TradeRecord {
         return TradeRecord(
             tradedAt = LocalDateTime.parse(date, FORMATTER).atZone(ZoneId.systemDefault()),
-            pair = pair,
+            symbol = Symbol.from(pair),
             side = Side.from(type),
             tradePrice = rate,
             tradeAmount = amount,

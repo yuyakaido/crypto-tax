@@ -1,6 +1,11 @@
 package model
 
-data class Asset(val value: String) {
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Asset(
+    val value: String
+) {
 
     companion object {
         private val BASE_ASSETS = listOf("BTC", "JPY", "USD", "USDT", "BUSD")

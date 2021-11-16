@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import model.Asset
 import model.Side
+import model.Symbol
 import model.TradeRecord
 import java.math.BigDecimal
 import java.time.Instant
@@ -30,7 +31,7 @@ data class SpotTradeHistoryResponse(
             .map { result ->
                 TradeRecord(
                     tradedAt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(result.time.toLong()), ZoneId.systemDefault()),
-                    pair = Asset.pair(result.symbol),
+                    symbol = Symbol.from(Asset.pair(result.symbol)),
                     side = if (result.isBuyer) { Side.Buy } else { Side.Sell },
                     tradePrice = BigDecimal(result.price),
                     tradeAmount = BigDecimal(result.qty),

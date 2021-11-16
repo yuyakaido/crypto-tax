@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import model.Asset
 import model.Side
+import model.Symbol
 import model.TradeRecord
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -34,7 +35,7 @@ data class TradeResponse(
     fun toTradeRecord(): TradeRecord {
         return TradeRecord(
             tradedAt = ZonedDateTime.parse(closedAt),
-            pair = Asset.pair(marketSymbol),
+            symbol = Symbol.from(Asset.pair(marketSymbol)),
             side = Side.from(direction),
             tradePrice = proceeds.divide(fillQuantity, RoundingMode.FLOOR),
             tradeAmount = fillQuantity,

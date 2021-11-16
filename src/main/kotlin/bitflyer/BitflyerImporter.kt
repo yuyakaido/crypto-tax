@@ -2,6 +2,7 @@ package bitflyer
 
 import model.Asset
 import model.Side
+import model.Symbol
 import model.TradeRecord
 import java.io.File
 import java.math.BigDecimal
@@ -79,7 +80,7 @@ object BitflyerImporter {
                 val feeAsset = Asset.first(pair)
                 TradeRecord(
                     tradedAt = LocalDateTime.parse(tradedAt, formatter).atZone(ZoneOffset.UTC.normalized()),
-                    pair = Asset.pair(pair),
+                    symbol = Symbol.from(Asset.pair(pair)),
                     side = Side.from(side),
                     tradePrice = BigDecimal(tradePrice),
                     tradeAmount = BigDecimal(tradeAmount),

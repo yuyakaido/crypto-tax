@@ -1,10 +1,7 @@
 package bitflyer
 
 import common.Service
-import csv.CsvExporter
-import csv.DepositHistory
-import csv.TradeHistory
-import csv.WithdrawHistory
+import csv.*
 import kotlinx.serialization.ExperimentalSerializationApi
 
 @ExperimentalSerializationApi
@@ -25,13 +22,13 @@ object BitflyerService : Service {
 //                unsortedRows = withdrawRecords
 //            )
 //        )
-//        val tradeRecords = BitflyerImporter.importTradeRecords()
-//        CsvExporter.export(
-//            TradeHistory(
-//                name = "bitflyer_trade_history",
-//                unsortedRows = tradeRecords
-//            )
-//        )
+        val tradeRecords = BitflyerImporter.importTradeRecords()
+        JsonExporter.export(
+            TradeHistory(
+                name = "bitflyer_trade_history",
+                unsortedRows = tradeRecords
+            )
+        )
     }
 
 }

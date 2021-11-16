@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonPrimitive
 import model.Asset
 import model.Side
+import model.Symbol
 import model.TradeRecord
 import java.math.BigDecimal
 import java.time.Instant
@@ -34,7 +35,7 @@ data class USDTPerpetualTradeHistoryResponse(
             .map { trade ->
                 TradeRecord(
                     tradedAt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(trade.tradeTimeMs), ZoneId.systemDefault()),
-                    pair = Asset.pair(trade.symbol),
+                    symbol = Symbol.from(Asset.pair(trade.symbol)),
                     side = Side.from(trade.side),
                     tradePrice = BigDecimal(trade.execPrice.content),
                     tradeAmount = BigDecimal(trade.execQty.content),

@@ -1,17 +1,20 @@
 package model
 
 import csv.CsvRecord
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import java.math.BigDecimal
 import java.time.ZonedDateTime
 
+@Serializable
 data class TradeRecord(
-    val tradedAt: ZonedDateTime,
-    val pair: Pair<Asset, Asset>,
-    val side: Side,
-    val tradePrice: BigDecimal,
-    val tradeAmount: BigDecimal,
-    val feeAmount: BigDecimal,
-    val feeAsset: Asset
+    @Contextual val tradedAt: ZonedDateTime,
+    @Contextual val symbol: Symbol,
+    @Contextual val side: Side,
+    @Contextual val tradePrice: BigDecimal,
+    @Contextual val tradeAmount: BigDecimal,
+    @Contextual val feeAmount: BigDecimal,
+    @Contextual val feeAsset: Asset
 ) : CsvRecord {
-    override val csv: String = "$tradedAt,${pair.first}/${pair.second},$side,$tradePrice,$tradeAmount,$feeAmount,$feeAsset"
+    override val csv: String = "$tradedAt,${symbol.first}/${symbol.second},$side,$tradePrice,$tradeAmount,$feeAmount,$feeAsset"
 }
