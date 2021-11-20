@@ -36,9 +36,6 @@ object BitflyerService : Service {
 //                unsortedRows = tradeRecords
 //            )
 //        )
-
-        val tradeHistory = JsonImporter.importTradeHistory("bitflyer_trade_history")
-        tradeHistory.sortedRows.forEach { println(it) }
     }
 
 }

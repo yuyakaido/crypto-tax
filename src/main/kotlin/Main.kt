@@ -5,6 +5,7 @@ import bybit.BybitService
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import poloniex.PoloniexService
+import tax.TotalAverageMethod
 import kotlin.system.exitProcess
 
 @ExperimentalSerializationApi
@@ -16,6 +17,7 @@ fun main() {
         PoloniexService.execute()
         BittrexService.execute()
         BybitService.execute()
+        TotalAverageMethod.calculate()
         println("Completed!")
         exitProcess(0)
     }
