@@ -1,9 +1,6 @@
 package bitflyer
 
-import model.Asset
-import model.Side
-import model.Symbol
-import model.TradeRecord
+import model.*
 import java.io.File
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -28,6 +25,7 @@ object BitflyerImporter {
 
     private const val TRADE_TYPE_DEPOSIT = "Wire Deposit"
     private const val TRADE_TYPE_WITHDRAW = "Withdrawal"
+    private const val TRADE_TYPE_RECEIVE = "Receive"
     private const val TRADE_TYPE_BUY = "Buy"
     private const val TRADE_TYPE_SELL = "Sell"
 
@@ -64,6 +62,21 @@ object BitflyerImporter {
             .filter { columns ->
                 val tradeType = columns[tradeTypeIndex]
                 tradeType == type
+            }
+    }
+
+    fun importDistributionRecords(): List<DistributionRecord> {
+        val rows = getFilteredRows(TRADE_TYPE_RECEIVE)
+        return rows
+            .map { columns ->
+                val distributedAt = columns[tradeDateIndex]
+                val asset = Asset.single(columns[productIndex])
+                val amount = columns[amountCurrency1Index]
+                DistributionRecord(
+                    distributedAt = LocalDateTime.parse(distributedAt, formatter).atZone(ZoneOffset.UTC.normalized()),
+                    asset = asset,
+                    amount = BigDecimal(amount)
+                )
             }
     }
 
