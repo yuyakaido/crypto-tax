@@ -1,8 +1,7 @@
 package poloniex
 
 import common.Service
-import csv.*
-import json.JsonExporter
+import json.*
 import kotlinx.serialization.ExperimentalSerializationApi
 
 @ExperimentalSerializationApi
@@ -10,12 +9,6 @@ object PoloniexService : Service {
 
     override suspend fun execute() {
 //        val depositWithdrawRecords = PoloniexDownloader.downloadDepositWithdrawRecords()
-//        JsonExporter.export(
-//            DistributionHistory(
-//                name = "poloniex_distribution_history",
-//                unsortedRows = depositWithdrawRecords.adjustments.map { it.toDistributionRecord() }
-//            )
-//        )
 //        JsonExporter.export(
 //            DepositHistory(
 //                name = "poloniex_deposit_history",
@@ -26,6 +19,12 @@ object PoloniexService : Service {
 //            WithdrawHistory(
 //                name = "poloniex_withdraw_history",
 //                unsortedRows = depositWithdrawRecords.withdrawals.map { it.toWithdrawRecord() }
+//            )
+//        )
+//        JsonExporter.export(
+//            DistributionHistory(
+//                name = "poloniex_distribution_history",
+//                unsortedRows = depositWithdrawRecords.adjustments.map { it.toDistributionRecord() }
 //            )
 //        )
 //        val tradeRecords = PoloniexDownloader.downloadTradeRecords()
