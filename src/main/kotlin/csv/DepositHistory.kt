@@ -5,7 +5,6 @@ import model.DepositRecord
 data class DepositHistory(
     override val name: String,
     override val unsortedRows: List<DepositRecord>
-) : CsvFile {
-    override val header: String = "DepositedAt,Asset,Amount"
-    override val sortedRows: List<CsvRecord> = unsortedRows.sortedByDescending { it.depositedAt }
+) : JsonFile<DepositRecord> {
+    override val sortedRows: List<DepositRecord> = unsortedRows.sortedByDescending { it.depositedAt }
 }

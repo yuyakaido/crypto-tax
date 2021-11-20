@@ -1,13 +1,13 @@
 package model
 
-import csv.CsvRecord
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import java.math.BigDecimal
 import java.time.ZonedDateTime
 
+@Serializable
 data class DepositRecord(
-    val depositedAt: ZonedDateTime,
-    val asset: Asset,
-    val amount: BigDecimal
-) : CsvRecord {
-    override val csv: String = "$depositedAt,$asset,$amount"
-}
+    @Contextual val depositedAt: ZonedDateTime,
+    @Contextual val asset: Asset,
+    @Contextual val amount: BigDecimal
+)

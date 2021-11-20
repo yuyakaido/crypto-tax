@@ -1,7 +1,7 @@
 package bitbank
 
 import common.Service
-import csv.CsvExporter
+import json.JsonExporter
 import csv.TradeHistory
 import kotlinx.serialization.ExperimentalSerializationApi
 
@@ -9,13 +9,13 @@ import kotlinx.serialization.ExperimentalSerializationApi
 object BitbankService : Service {
 
     override suspend fun execute() {
-//        val tradeRecords = BitbankDownloader.downloadTradeHistory()
-//        CsvExporter.export(
-//            TradeHistory(
-//                name = "bitbank_trade_history",
-//                unsortedRows = tradeRecords
-//            )
-//        )
+        val tradeRecords = BitbankDownloader.downloadTradeHistory()
+        JsonExporter.export(
+            TradeHistory(
+                name = "bitbank_trade_history",
+                unsortedRows = tradeRecords
+            )
+        )
     }
 
 }
