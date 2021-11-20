@@ -4,7 +4,7 @@ import model.*
 import java.io.File
 import java.math.BigDecimal
 import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 object BitflyerImporter {
@@ -73,7 +73,7 @@ object BitflyerImporter {
                 val asset = Asset.single(columns[productIndex])
                 val amount = columns[amountCurrency1Index]
                 DistributionRecord(
-                    distributedAt = LocalDateTime.parse(distributedAt, formatter).atZone(ZoneOffset.UTC.normalized()),
+                    distributedAt = LocalDateTime.parse(distributedAt, formatter).atZone(ZoneId.systemDefault()),
                     asset = asset,
                     amount = BigDecimal(amount)
                 )
@@ -92,7 +92,7 @@ object BitflyerImporter {
                 val feeAmount = columns[feeIndex].replace("-", "")
                 val feeAsset = Asset.first(pair)
                 TradeRecord(
-                    tradedAt = LocalDateTime.parse(tradedAt, formatter).atZone(ZoneOffset.UTC.normalized()),
+                    tradedAt = LocalDateTime.parse(tradedAt, formatter).atZone(ZoneId.systemDefault()),
                     symbol = Symbol.from(Asset.pair(pair)),
                     side = Side.from(side),
                     tradePrice = BigDecimal(tradePrice),

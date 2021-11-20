@@ -1,8 +1,7 @@
 package bitflyer
 
 import common.Service
-import json.DistributionHistory
-import json.JsonExporter
+import json.*
 import kotlinx.serialization.ExperimentalSerializationApi
 
 @ExperimentalSerializationApi
@@ -23,14 +22,13 @@ object BitflyerService : Service {
 //                unsortedRows = withdrawRecords
 //            )
 //        )
-        val distributionRecords = BitflyerImporter.importDistributionRecords()
-        distributionRecords.forEach { println(it) }
-        JsonExporter.export(
-            DistributionHistory(
-                name = "bitflyer_distribution_history",
-                unsortedRows = distributionRecords
-            )
-        )
+//        val distributionRecords = BitflyerImporter.importDistributionRecords()
+//        JsonExporter.export(
+//            DistributionHistory(
+//                name = "bitflyer_distribution_history",
+//                unsortedRows = distributionRecords
+//            )
+//        )
 //        val tradeRecords = BitflyerImporter.importTradeRecords()
 //        JsonExporter.export(
 //            TradeHistory(
@@ -38,6 +36,9 @@ object BitflyerService : Service {
 //                unsortedRows = tradeRecords
 //            )
 //        )
+
+        val tradeHistory = JsonImporter.importTradeHistory("bitflyer_trade_history")
+        tradeHistory.sortedRows.forEach { println(it) }
     }
 
 }
