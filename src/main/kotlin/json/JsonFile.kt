@@ -1,4 +1,4 @@
-package csv
+package json
 
 interface JsonFile<T> {
     val name: String
