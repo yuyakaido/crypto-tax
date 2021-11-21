@@ -1,6 +1,10 @@
 package bittrex
 
 import common.Service
+import json.DepositHistory
+import json.JsonExporter
+import json.TradeHistory
+import json.WithdrawHistory
 import kotlinx.serialization.ExperimentalSerializationApi
 
 @ExperimentalSerializationApi

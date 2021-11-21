@@ -8,10 +8,8 @@ import kotlinx.serialization.json.jsonArray
 import model.Asset
 import model.ChartRecord
 import model.TradeRecord
-import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
 
 @ExperimentalSerializationApi
 object PoloniexDownloader {
@@ -22,10 +20,10 @@ object PoloniexDownloader {
         .newInstance(
             baseUrl = "https://poloniex.com/",
             interceptors = listOf(
-//                PoloniexHttpInterceptor(
-//                    apiKey = apiKey,
-//                    apiSecret = apiSecret
-//                )
+                PoloniexHttpInterceptor(
+                    apiKey = apiKey,
+                    apiSecret = apiSecret
+                )
             )
         )
         .create(PoloniexHttpClient::class.java)
