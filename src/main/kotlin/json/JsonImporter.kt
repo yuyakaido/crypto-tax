@@ -7,10 +7,15 @@ import kotlinx.serialization.decodeFromString
 @ExperimentalSerializationApi
 object JsonImporter : IO {
 
-    fun importTradeHistory(fileName: String): TradeHistory {
+    fun importTradeHistory(name: String): TradeHistory {
         return TradeHistory(
-            name = fileName,
-            unsortedRows = RetrofitCreator.getJson().decodeFromString(import(fileName))
+            name = name,
+            records = RetrofitCreator.getJson().decodeFromString(
+                string = import(
+                    name = name,
+                    from = IO.Directory.Inputs
+                )
+            )
         )
     }
 

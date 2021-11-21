@@ -14,28 +14,28 @@ object BybitService : Service {
 //        JsonExporter.export(
 //            WithdrawHistory(
 //                name = "bybit_withdraw_history",
-//                unsortedRows = withdrawRecords
+//                records = withdrawRecords
 //            )
 //        )
 //        val inverseTradeRecords = BybitDownloader.downloadInversePerpetualTradeRecords()
 //        JsonExporter.export(
 //            TradeHistory(
 //                name = "bybit_inverse_trade_history",
-//                unsortedRows = inverseTradeRecords
+//                records = inverseTradeRecords
 //            )
 //        )
 //        val usdtTradeRecords = BybitDownloader.downloadUSDTPerpetualTradeRecords()
 //        JsonExporter.export(
 //            TradeHistory(
 //                name = "bybit_usdt_trade_history",
-//                unsortedRows = usdtTradeRecords
+//                records = usdtTradeRecords
 //            )
 //        )
 //        val spotTradeRecords = BybitDownloader.downloadSpotTradeRecords()
 //        JsonExporter.export(
 //            TradeHistory(
 //                name = "bybit_spot_trade_history",
-//                unsortedRows = spotTradeRecords
+//                records = spotTradeRecords
 //            )
 //        )
     }

@@ -13,7 +13,7 @@ object BitbankService : Service {
 //        JsonExporter.export(
 //            TradeHistory(
 //                name = "bitbank_trade_history",
-//                unsortedRows = tradeRecords
+//                records = tradeRecords
 //            )
 //        )
     }

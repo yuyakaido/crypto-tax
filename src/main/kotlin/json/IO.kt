@@ -6,27 +6,32 @@ import java.io.File
 @ExperimentalSerializationApi
 interface IO {
 
-    private fun getTargetDirectory(): File {
-        return File("${System.getProperty("user.dir")}/outputs")
+    enum class Directory(private val path: String) {
+        Inputs("inputs"),
+        Outputs("outputs"),
+        Resources("resources");
+        fun toFile(): File {
+            return File("${System.getProperty("user.dir")}/${path}")
+        }
     }
 
-    private fun getTargetFile(targetDirectory: File, fileName: String): File {
-        return File("${targetDirectory.path}/${fileName}.json")
+    private fun getTargetFile(directory: File, name: String): File {
+        return File("${directory.path}/${name}.json")
     }
 
-    fun <T> export(jsonFile: JsonFile<T>, jsonText: String) {
-        val targetDirectory = getTargetDirectory()
+    fun <T> export(file: JsonFile<T>, into: Directory) {
+        val targetDirectory = into.toFile()
         targetDirectory.mkdir()
-        val targetFile = getTargetFile(targetDirectory, jsonFile.name)
+        val targetFile = getTargetFile(targetDirectory, file.name)
         targetFile.createNewFile()
         targetFile.bufferedWriter().apply {
-            append(jsonText)
+            append(file.json.toString())
         }.close()
     }
 
-    fun import(fileName: String): String {
-        val targetDirectory = getTargetDirectory()
-        val targetFile = getTargetFile(targetDirectory, fileName)
+    fun import(name: String, from: Directory): String {
+        val targetDirectory = from.toFile()
+        val targetFile = getTargetFile(targetDirectory, name)
         return targetFile.readText()
     }
 

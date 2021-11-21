@@ -1,7 +1,9 @@
 package json
 
+import kotlinx.serialization.json.JsonElement
+
 interface JsonFile<T> {
     val name: String
-    val unsortedRows: List<T>
-    val sortedRows: List<T>
+    val records: List<T>
+    val json: JsonElement
 }

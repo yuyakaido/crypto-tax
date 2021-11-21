@@ -1,10 +1,15 @@
 package json
 
+import common.RetrofitCreator
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.encodeToJsonElement
 import model.DistributionRecord
 
+@ExperimentalSerializationApi
 data class DistributionHistory(
     override val name: String,
-    override val unsortedRows: List<DistributionRecord>
+    override val records: List<DistributionRecord>
 ) : JsonFile<DistributionRecord> {
-    override val sortedRows: List<DistributionRecord> = unsortedRows.sortedByDescending { it.distributedAt }
+    override val json: JsonElement = RetrofitCreator.getJson().encodeToJsonElement(records)
 }
