@@ -29,9 +29,9 @@ object ForeignExchangeImporter {
             .filter { it.date.year >= 2008 }
 
         var from = LocalDate.of(2009, 1, 1)
-        val to = LocalDate.of(2021, 11, 21)
+        val to = LocalDate.now()
         val revisedRecords = mutableListOf<RateRecord>()
-        while (from != to) {
+        while (from < to) {
             var record = rawRecords.find { it.date == from }
             if (record != null) {
                 revisedRecords.add(record)

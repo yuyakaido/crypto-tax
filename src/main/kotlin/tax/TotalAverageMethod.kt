@@ -10,9 +10,7 @@ import java.math.BigDecimal
 object TotalAverageMethod {
 
     fun calculate() {
-//        val tradeHistory = JsonImporter.importTradeHistory("bitflyer_trade_history")
-//
-//        val tradeRecords = tradeHistory.sortedRows
+//        val tradeRecords = JsonImporter.importTradeRecords("bitflyer_trade_history")
 //            .filter { it.tradedAt.year == 2017 }
 //            .filter { it.symbol.first == Asset.single("MONA") }
 //        val buyTradeRecords = tradeRecords

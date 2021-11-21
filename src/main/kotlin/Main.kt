@@ -13,12 +13,12 @@ import kotlin.system.exitProcess
 fun main() {
     runBlocking {
         println("Started!")
-        ForeignExchangeService.execute()
         BitflyerService.execute()
         BitbankService.execute()
         PoloniexService.execute()
         BittrexService.execute()
         BybitService.execute()
+        ForeignExchangeService.execute()
         TotalAverageMethod.calculate()
         println("Completed!")
         exitProcess(0)
