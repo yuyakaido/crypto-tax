@@ -35,15 +35,17 @@ object PoloniexService : Service {
 //                unsortedRows = tradeRecords
 //            )
 //        )
-//        val from = LocalDateTime.of(2021, 11, 18, 0, 0 ,0)
-//        val to = LocalDateTime.now()
-//        val chartRecords = PoloniexDownloader.downloadChartRecords(from = from, to = to)
-//        JsonExporter.export(
-//            ChartHistory(
-//                name = "btc_usdt_histrical_data",
-//                unsortedRows = chartRecords
+//        (2017..2021).forEach { year ->
+//            val from = LocalDateTime.of(year, 1, 1, 0, 0 ,0)
+//            val to = LocalDateTime.of(year, 12, 31, 23, 59, 59)
+//            val chartRecords = PoloniexDownloader.downloadChartRecords(from = from, to = to)
+//            JsonExporter.export(
+//                ChartHistory(
+//                    name = "poloniex_btc_usdt_chart_history_$year",
+//                    unsortedRows = chartRecords
+//                )
 //            )
-//        )
+//        }
     }
 
 }

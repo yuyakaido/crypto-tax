@@ -35,8 +35,7 @@ object PoloniexDownloader {
         val records = mutableListOf<ChartRecord>()
 
         while (true) {
-            println("Start: $start")
-            println("End: $end")
+            println("Start: $start, End: $end")
 
             val startEpochSeconds = start.toEpochSecond(ZoneOffset.UTC)
             val endEpochSeconds = end.toEpochSecond(ZoneOffset.UTC)
@@ -51,7 +50,7 @@ object PoloniexDownloader {
             start = start.plusDays(1)
             end = end.plusDays(1)
 
-            if (end < to) {
+            if (end <= to) {
                 delay(10000)
             } else {
                 break
