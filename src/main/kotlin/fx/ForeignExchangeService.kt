@@ -9,7 +9,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 object ForeignExchangeService : Service {
 
     override suspend fun execute() {
-//        val records = ForeignExchangeImporter.import().filter { it.date.year >= 2016 }
+//        val records = ForeignExchangeImporter.import()
 //        JsonExporter.export(
 //            RateHistory(
 //                name = "macrotrends_usd_jpy_chart_history",

@@ -26,9 +26,9 @@ object ForeignExchangeImporter {
                     price = BigDecimal(columns[valueIndex])
                 )
             }
-            .filter { it.date.year >= 2016 }
+            .filter { it.date.year >= 2008 }
 
-        var from = LocalDate.of(2017, 1, 1)
+        var from = LocalDate.of(2009, 1, 1)
         val to = LocalDate.of(2021, 11, 21)
         val revisedRecords = mutableListOf<RateRecord>()
         while (from != to) {
