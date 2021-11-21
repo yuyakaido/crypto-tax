@@ -7,7 +7,6 @@ import java.io.File
 interface IO {
 
     enum class Directory(private val path: String) {
-        Inputs("inputs"),
         Outputs("outputs"),
         Resources("resources");
         fun toFile(): File {

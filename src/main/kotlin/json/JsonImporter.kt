@@ -22,7 +22,7 @@ object JsonImporter : IO {
         return RetrofitCreator.getJson().decodeFromString(
             string = import(
                 name = name,
-                from = IO.Directory.Inputs
+                from = IO.Directory.Outputs
             )
         )
     }
