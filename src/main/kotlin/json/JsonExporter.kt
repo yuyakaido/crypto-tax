@@ -15,7 +15,7 @@ object JsonExporter : IO {
     fun export(file: ChartHistory) {
         export(
             file = file,
-            into = IO.Directory.Outputs
+            into = IO.Directory.Resources
         )
     }
 

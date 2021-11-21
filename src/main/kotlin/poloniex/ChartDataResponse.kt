@@ -7,6 +7,7 @@ import model.ChartRecord
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 @Serializable
@@ -22,7 +23,7 @@ data class ChartDataResponse(
 ) {
     fun toChartRecord(): ChartRecord {
         return ChartRecord(
-            date = ZonedDateTime.ofInstant(Instant.ofEpochSecond(date), ZoneId.systemDefault()),
+            date = ZonedDateTime.ofInstant(Instant.ofEpochSecond(date), ZoneOffset.UTC),
             price = close
         )
     }

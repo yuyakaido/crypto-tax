@@ -45,7 +45,11 @@ object PoloniexDownloader {
                 end = endEpochSeconds
             )
 
-            records.addAll(response.map { it.toChartRecord() })
+            records.addAll(
+                response
+                    .map { it.toChartRecord() }
+                    .filter { it.date.toEpochSecond() >= start.toEpochSecond(ZoneOffset.UTC) }
+            )
 
             start = start.plusDays(1)
             end = end.plusDays(1)
