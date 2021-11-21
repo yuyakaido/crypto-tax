@@ -25,6 +25,15 @@ application {
     ]
 }
 
+compileJava {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_11
+}
+
 repositories {
     mavenCentral()
 }
