@@ -20,6 +20,7 @@ object RetrofitCreator {
             .plus(serializersModuleOf(SymbolSerializer))
             .plus(serializersModuleOf(AssetSerializer))
             .plus(serializersModuleOf(ZonedDateTimeSerializer))
+            .plus(serializersModuleOf(LocalDateSerializer))
     }
     private val loggingInterceptor = HttpLoggingInterceptor()
         .apply { level = HttpLoggingInterceptor.Level.NONE }

@@ -7,6 +7,13 @@ import kotlinx.serialization.json.encodeToJsonElement
 @ExperimentalSerializationApi
 object JsonExporter : IO {
 
+    fun export(file: RateHistory) {
+        export(
+            jsonFile = file,
+            jsonText = RetrofitCreator.getJson().encodeToJsonElement(file.unsortedRows).toString()
+        )
+    }
+
     fun export(file: ChartHistory) {
         export(
             jsonFile = file,
