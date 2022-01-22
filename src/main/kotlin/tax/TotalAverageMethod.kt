@@ -27,6 +27,7 @@ object TotalAverageMethod {
             .plus(bittrexTradeRecords)
             .plus(poloniexTradeRecords)
             .filter { it.tradedAt.year == 2017 }
+            .sortedBy { it.tradedAt }
 
         val holdings = allTradeRecords
             .groupBy { it.symbol.first }
@@ -54,17 +55,48 @@ object TotalAverageMethod {
             println(it)
         }
 
-        bitflyerTradeRecords
+        allTradeRecords
             .filter { it.tradedAt.year == 2017 }
-            .filter { it.side == Side.Sell }
             .forEach {
-                val holding = holdings.getValue(it.symbol.first)
-                val profitLoss = ProfitLoss(
-                    tradedAt = it.tradedAt,
-                    symbol = it.symbol,
-                    value = it.tradePrice.multiply(it.tradeAmount) - holding.averagePrice.multiply(it.tradeAmount)
-                )
-                println(profitLoss)
+                when (it.side) {
+                    Side.Buy -> {
+                        if (it.symbol.second == Asset.single("BTC")) {
+                            val holding = holdings.getValue(it.symbol.second)
+                            val costQuote = it.tradePrice.multiply(it.tradeAmount)
+                            val profitLoss = ProfitLoss(
+                                tradedAt = it.tradedAt,
+                                symbol = it.symbol,
+                                side = it.side,
+                                value = costQuote.multiply(getNearestBtcJpyPrice(it.tradedAt)) - costQuote.multiply(holding.averagePrice)
+                            )
+                            println(profitLoss)
+                        } else {
+                            println("Skipped! $it")
+                        }
+                    }
+                    Side.Sell -> {
+                        if (it.symbol.second == Asset.single("JPY")) {
+                            val holding = holdings.getValue(it.symbol.first)
+                            val profitLoss = ProfitLoss(
+                                tradedAt = it.tradedAt,
+                                symbol = it.symbol,
+                                side = it.side,
+                                value = it.tradePrice.multiply(it.tradeAmount) - holding.averagePrice.multiply(it.tradeAmount)
+                            )
+                            println(profitLoss)
+                        } else {
+                            val holding = holdings.getValue(it.symbol.first)
+                            val costQuote = it.tradePrice.multiply(it.tradeAmount)
+                            val profitLoss = ProfitLoss(
+                                tradedAt = it.tradedAt,
+                                symbol = it.symbol,
+                                side = it.side,
+                                value = costQuote.multiply(getNearestBtcJpyPrice(it.tradedAt)) - costQuote.multiply(holding.averagePrice)
+                            )
+                            println(profitLoss)
+                        }
+                    }
+                }
             }
     }
 
