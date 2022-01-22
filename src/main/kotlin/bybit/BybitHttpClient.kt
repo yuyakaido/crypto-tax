@@ -25,9 +25,13 @@ interface BybitHttpClient {
         @Query("page") page: Int
     ): USDTPerpetualTradeHistoryResponse
 
+    @GET("/spot/v1/symbols")
+    suspend fun getSpotSymbolList(): SymbolListResponse
+
     @GET("/spot/v1/myTrades")
     suspend fun getSpotTradeHistory(
-        @Query("symbol") symbol: String = "DOTUSDT",
-        @Query("page") page: Int
+        @Query("symbol") symbol: String,
+        @Query("startTime") startTime: String,
+        @Query("fromId") fromId: String?
     ): SpotTradeHistoryResponse
 }

@@ -8,6 +8,7 @@ data class Symbol(
     @Contextual val first: Asset,
     @Contextual val second: Asset
 ) {
+
     companion object {
         fun from(pair: Pair<Asset, Asset>): Symbol {
             return Symbol(
@@ -16,7 +17,12 @@ data class Symbol(
             )
         }
     }
+
     override fun toString(): String {
         return "$first/$second"
+    }
+
+    fun toBybitString(): String {
+        return "$first$second"
     }
 }

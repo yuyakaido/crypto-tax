@@ -8,7 +8,7 @@ data class Asset(
 ) {
 
     companion object {
-        private val BASE_ASSETS = listOf("BTC", "JPY", "USD", "USDT", "BUSD")
+        private val BASE_ASSETS = listOf("BTC", "USDT", "BUSD", "USDC", "JPY", "USD")
 
         private fun sanitize(symbol: String): String {
             return symbol

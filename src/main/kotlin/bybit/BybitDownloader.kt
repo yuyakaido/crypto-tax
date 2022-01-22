@@ -3,8 +3,14 @@ package bybit
 import common.RetrofitCreator
 import kotlinx.coroutines.delay
 import kotlinx.serialization.ExperimentalSerializationApi
+import model.Asset
+import model.Symbol
 import model.TradeRecord
 import model.WithdrawRecord
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 @ExperimentalSerializationApi
 object BybitDownloader {
@@ -22,6 +28,14 @@ object BybitDownloader {
             )
         )
         .create(BybitHttpClient::class.java)
+
+    suspend fun downloadSpotSymbols(): List<Symbol> {
+        val response = client.getSpotSymbolList()
+        return response.result
+            .map {
+                Symbol.from(Asset.pair(it.name))
+            }
+    }
 
     suspend fun downloadWithdrawRecords(): List<WithdrawRecord> {
         return client.getWithdrawHistory().toWithdrawRecords()
@@ -59,18 +73,33 @@ object BybitDownloader {
         return responses.flatMap { it.toTradeRecords() }
     }
 
-    suspend fun downloadSpotTradeRecords(): List<TradeRecord> {
+    suspend fun downloadSpotTradeRecords(
+        symbols: List<Symbol>
+    ): List<TradeRecord> {
         println("Fetching bybit spot trade history")
         val responses = mutableListOf<SpotTradeHistoryResponse>()
-        var page = 1
-        while (true) {
-            println("Page = $page")
-            val response = client.getSpotTradeHistory(page = page++)
-            responses.add(response)
-            if (response.result.size < 50) {
-                break
+        symbols.forEach {
+            println("Fetching $it trade history")
+            val startTime = LocalDateTime
+                .of(2021, 1, 1, 0, 0, 0)
+                .toInstant(ZoneOffset.UTC)
+                .toEpochMilli()
+                .toString()
+            var fromId: String? = null
+            while (true) {
+                val response = client.getSpotTradeHistory(
+                    symbol = it.toBybitString(),
+                    startTime = startTime,
+                    fromId = fromId
+                )
+                responses.add(response)
+                delay(5000)
+                if (response.result.size < 50) {
+                    break
+                } else {
+                    fromId = response.result.last().ticketId
+                }
             }
-            delay(5000)
         }
         return responses.flatMap { it.toTradeRecords() }
     }

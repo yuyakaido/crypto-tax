@@ -17,7 +17,7 @@ data class SpotTradeHistoryResponse(
 ) {
     @Serializable
     data class Result(
-        @SerialName("id") val id: String,
+        @SerialName("ticketId") val ticketId: String,
         @SerialName("time") val time: String,
         @SerialName("symbol") val symbol: String,
         @SerialName("isBuyer") val isBuyer: Boolean,
