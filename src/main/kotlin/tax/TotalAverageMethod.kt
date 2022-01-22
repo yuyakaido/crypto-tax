@@ -59,8 +59,12 @@ object TotalAverageMethod {
             .filter { it.side == Side.Sell }
             .forEach {
                 val holding = holdings.getValue(it.symbol.first)
-                val profitLoss = it.tradePrice.multiply(it.tradeAmount) - holding.averagePrice.multiply(it.tradeAmount)
-                println("${it.tradedAt}: ${it.symbol}: ¥$profitLoss")
+                val profitLoss = ProfitLoss(
+                    tradedAt = it.tradedAt,
+                    symbol = it.symbol,
+                    value = it.tradePrice.multiply(it.tradeAmount) - holding.averagePrice.multiply(it.tradeAmount)
+                )
+                println(profitLoss)
             }
     }
 
