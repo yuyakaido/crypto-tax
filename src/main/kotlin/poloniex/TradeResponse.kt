@@ -29,14 +29,25 @@ data class TradeResponse(
         private val FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")
     }
     fun toTradeRecord(pair: Pair<Asset, Asset>): TradeRecord {
+        val symbol = Symbol.from(pair)
+        val side = Side.from(type)
         return TradeRecord(
-            tradedAt = LocalDateTime.parse(date, FORMATTER).atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault()),
-            symbol = Symbol.from(pair),
-            side = Side.from(type),
+            tradedAt = LocalDateTime
+                .parse(date, FORMATTER)
+                .atZone(ZoneOffset.UTC)
+                .withZoneSameInstant(ZoneId.systemDefault()),
+            symbol = symbol,
+            side = side,
             tradePrice = rate,
             tradeAmount = amount,
-            feeAmount = fee,
-            feeAsset = pair.second
+            feeAmount = when (side) {
+                Side.Buy -> amount.multiply(fee)
+                Side.Sell -> total.multiply(fee)
+            },
+            feeAsset = when (side) {
+                Side.Buy -> symbol.first
+                Side.Sell -> symbol.second
+            }
         )
     }
 }
