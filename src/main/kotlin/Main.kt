@@ -6,7 +6,7 @@ import fx.ForeignExchangeService
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import poloniex.PoloniexService
-import tax.TotalAverageMethod
+import tax.TaxService
 import kotlin.system.exitProcess
 
 @ExperimentalSerializationApi
@@ -19,7 +19,7 @@ fun main() {
         BittrexService.execute()
         BybitService.execute()
         ForeignExchangeService.execute()
-        TotalAverageMethod.calculate()
+        TaxService.execute()
         println("Completed!")
         exitProcess(0)
     }

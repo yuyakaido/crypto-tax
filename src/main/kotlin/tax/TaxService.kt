@@ -1,5 +1,6 @@
 package tax
 
+import common.Service
 import json.JsonImporter
 import kotlinx.serialization.ExperimentalSerializationApi
 import model.Asset
@@ -8,9 +9,13 @@ import java.math.BigDecimal
 import java.time.ZonedDateTime
 
 @ExperimentalSerializationApi
-object TotalAverageMethod {
+object TaxService : Service {
 
     private val btcJpyChartRecords = JsonImporter.importChartRecords("yuyakaido_btc_jpy_chart_history_2017")
+
+    override suspend fun execute() {
+//        calculate()
+    }
 
     private fun getNearestBtcJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
         val range = tradedAt to tradedAt.plusMinutes(5)
@@ -19,7 +24,7 @@ object TotalAverageMethod {
         }.price
     }
 
-    fun calculate() {
+    private fun calculate() {
         val bitflyerTradeRecords = JsonImporter.importTradeRecords("bitflyer_trade_history")
         val bittrexTradeRecords = JsonImporter.importTradeRecords("bittrex_trade_history")
         val poloniexTradeRecords = JsonImporter.importTradeRecords("poloniex_trade_history")
