@@ -77,9 +77,9 @@ object TotalAverageMethod {
 
         holdings.forEach { println(it) }
 
-        allTradeRecords
+        val transactions = allTradeRecords
             .filter { it.tradedAt.year == 2017 }
-            .forEach {
+            .map {
                 when (it.side) {
                     Side.Buy -> {
                         if (it.symbol.second == Asset.single("BTC")) {
@@ -91,7 +91,15 @@ object TotalAverageMethod {
                                 side = it.side,
                                 value = quoteAmount.multiply(getNearestBtcJpyPrice(it.tradedAt)) - quoteAmount.multiply(holding.averagePrice)
                             )
-                            println(profitLoss)
+                            return@map it.symbol.second to profitLoss
+                        } else {
+                            val profitLoss = ProfitLoss(
+                                tradedAt = it.tradedAt,
+                                symbol = it.symbol,
+                                side = it.side,
+                                value = BigDecimal.ZERO
+                            )
+                            return@map it.symbol.first to profitLoss
                         }
                     }
                     Side.Sell -> {
@@ -103,21 +111,34 @@ object TotalAverageMethod {
                                 side = it.side,
                                 value = it.tradePrice.multiply(it.tradeAmount) - holding.averagePrice.multiply(it.tradeAmount)
                             )
-                            println(profitLoss)
+                            return@map it.symbol.first to profitLoss
                         } else {
                             val holding = holdings.getValue(it.symbol.first)
-                            val quoteAmount = it.tradePrice.multiply(it.tradeAmount)
+                            val unitProfit = it.tradePrice.multiply(getNearestBtcJpyPrice(it.tradedAt)) - holding.averagePrice
                             val profitLoss = ProfitLoss(
                                 tradedAt = it.tradedAt,
                                 symbol = it.symbol,
                                 side = it.side,
-                                value = quoteAmount.multiply(getNearestBtcJpyPrice(it.tradedAt)) - quoteAmount.multiply(holding.averagePrice)
+                                value = unitProfit.multiply(it.tradeAmount)
                             )
-                            println(profitLoss)
+                            return@map it.symbol.first to profitLoss
                         }
                     }
                 }
             }
+
+        transactions.filter { it.first == Asset.single("XEM") }
+            .forEach { println(it.second) }
+
+        transactions.groupBy(
+            keySelector = { it.first },
+            valueTransform = { it.second }
+        ).forEach { entry ->
+            val totalProfitLoss = entry.value.fold(BigDecimal.ZERO) { total, transaction ->
+                total + transaction.value
+            }
+            println("${entry.key}: $totalProfitLoss")
+        }
     }
 
 }
