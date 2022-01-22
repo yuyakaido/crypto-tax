@@ -10,6 +10,7 @@ import model.Symbol
 import model.TradeRecord
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.ZoneId
 import java.time.ZonedDateTime
 
 @Serializable
@@ -34,7 +35,7 @@ data class TradeResponse(
 ) {
     fun toTradeRecord(): TradeRecord {
         return TradeRecord(
-            tradedAt = ZonedDateTime.parse(closedAt),
+            tradedAt = ZonedDateTime.parse(closedAt).withZoneSameInstant(ZoneId.systemDefault()),
             symbol = Symbol.from(Asset.pair(marketSymbol)),
             side = Side.from(direction),
             tradePrice = proceeds.divide(fillQuantity, RoundingMode.FLOOR),
