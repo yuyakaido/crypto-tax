@@ -34,14 +34,15 @@ data class TradeResponse(
     @SerialName("orderToCancel") val orderToCancel: JsonObject? = null
 ) {
     fun toTradeRecord(): TradeRecord {
+        val symbol = Symbol.from(Asset.pair(marketSymbol))
         return TradeRecord(
             tradedAt = ZonedDateTime.parse(closedAt).withZoneSameInstant(ZoneId.systemDefault()),
-            symbol = Symbol.from(Asset.pair(marketSymbol)),
+            symbol = symbol,
             side = Side.from(direction),
             tradePrice = proceeds.divide(fillQuantity, RoundingMode.FLOOR),
             tradeAmount = fillQuantity,
             feeAmount = commission,
-            feeAsset = Asset.first(marketSymbol)
+            feeAsset = symbol.second
         )
     }
 }
