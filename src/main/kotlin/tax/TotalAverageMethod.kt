@@ -28,7 +28,7 @@ object TotalAverageMethod {
             .plus(poloniexTradeRecords)
             .filter { it.tradedAt.year == 2017 }
 
-        val averagePrices = allTradeRecords
+        val holdings = allTradeRecords
             .groupBy { it.symbol.first }
             .mapValues { entry ->
                 val buyTradeRecords = entry.value.filter { it.side == Side.Buy }
@@ -44,19 +44,22 @@ object TotalAverageMethod {
                         }
                     }
                 }
-                return@mapValues totalCost.div(totalAmount)
+                return@mapValues Holding(
+                    amount = totalAmount,
+                    averagePrice = totalCost.div(totalAmount)
+                )
             }
 
-        averagePrices.forEach {
-            println("${it.key}: ¥${it.value}")
+        holdings.forEach {
+            println(it)
         }
 
         bitflyerTradeRecords
             .filter { it.tradedAt.year == 2017 }
             .filter { it.side == Side.Sell }
             .forEach {
-                val averagePrice = averagePrices.getValue(it.symbol.first)
-                val profitLoss = it.tradePrice.multiply(it.tradeAmount) - averagePrice.multiply(it.tradeAmount)
+                val holding = holdings.getValue(it.symbol.first)
+                val profitLoss = it.tradePrice.multiply(it.tradeAmount) - holding.averagePrice.multiply(it.tradeAmount)
                 println("${it.tradedAt}: ${it.symbol}: ¥$profitLoss")
             }
     }
