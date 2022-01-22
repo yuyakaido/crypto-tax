@@ -1,13 +1,9 @@
 package tax
 
-import model.Side
-import model.Symbol
+import model.TradeRecord
 import java.math.BigDecimal
-import java.time.ZonedDateTime
 
 data class ProfitLoss(
-    val tradedAt: ZonedDateTime,
-    val symbol: Symbol,
-    val side: Side,
+    val tradeRecord: TradeRecord,
     val value: BigDecimal
 )

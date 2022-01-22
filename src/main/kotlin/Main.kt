@@ -19,7 +19,7 @@ fun main() {
         BittrexService.execute()
         BybitService.execute()
         ForeignExchangeService.execute()
-//        TotalAverageMethod.calculate()
+        TotalAverageMethod.calculate()
         println("Completed!")
         exitProcess(0)
     }
