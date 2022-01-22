@@ -8,6 +8,7 @@ import model.Side
 import model.Symbol
 import model.TradeRecord
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -41,8 +42,8 @@ data class TradeResponse(
             tradePrice = rate,
             tradeAmount = amount,
             feeAmount = when (side) {
-                Side.Buy -> amount.multiply(fee)
-                Side.Sell -> total.multiply(fee)
+                Side.Buy -> amount.multiply(fee).setScale(8, RoundingMode.DOWN)
+                Side.Sell -> total.multiply(fee).setScale(8, RoundingMode.DOWN)
             },
             feeAsset = when (side) {
                 Side.Buy -> symbol.first

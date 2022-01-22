@@ -14,7 +14,7 @@ object TaxService : Service {
     private val btcJpyChartRecords = JsonImporter.importChartRecords("yuyakaido_btc_jpy_chart_history_2017")
 
     override suspend fun execute() {
-//        calculate()
+        calculate()
     }
 
     private fun getNearestBtcJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
@@ -94,12 +94,14 @@ object TaxService : Service {
                             val holding = wallet.holdings.getValue(asset)
                             val quoteAmount = it.tradePrice.multiply(it.tradeAmount)
                             wallet = wallet.minus(asset, quoteAmount)
+                            wallet = wallet.minus(it.feeAsset, it.feeAmount)
                             val profitLoss = ProfitLoss(
                                 tradeRecord = it,
                                 value = quoteAmount.multiply(getNearestBtcJpyPrice(it.tradedAt)) - quoteAmount.multiply(holding.averagePrice)
                             )
                             return@map it.symbol.second to profitLoss
                         } else {
+                            wallet = wallet.minus(it.feeAsset, it.feeAmount)
                             val profitLoss = ProfitLoss(
                                 tradeRecord = it,
                                 value = BigDecimal.ZERO
@@ -112,6 +114,7 @@ object TaxService : Service {
                             val asset = it.symbol.first
                             val holding = wallet.holdings.getValue(asset)
                             wallet = wallet.minus(asset, it.tradeAmount)
+                            wallet = wallet.minus(it.feeAsset, it.feeAmount)
                             val profitLoss = ProfitLoss(
                                 tradeRecord = it,
                                 value = it.tradePrice.multiply(it.tradeAmount) - holding.averagePrice.multiply(it.tradeAmount)
@@ -121,6 +124,7 @@ object TaxService : Service {
                             val asset = it.symbol.first
                             val holding = wallet.holdings.getValue(it.symbol.first)
                             wallet = wallet.minus(asset, it.tradeAmount)
+                            wallet = wallet.minus(it.feeAsset, it.feeAmount)
                             val unitProfit = it.tradePrice.multiply(getNearestBtcJpyPrice(it.tradedAt)) - holding.averagePrice
                             val profitLoss = ProfitLoss(
                                 tradeRecord = it,
