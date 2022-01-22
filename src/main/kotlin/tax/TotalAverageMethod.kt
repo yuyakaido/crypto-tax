@@ -29,31 +29,53 @@ object TotalAverageMethod {
             .filter { it.tradedAt.year == 2017 }
             .sortedBy { it.tradedAt }
 
-        val holdings = allTradeRecords
-            .groupBy { it.symbol.first }
-            .mapValues { entry ->
-                val buyTradeRecords = entry.value.filter { it.side == Side.Buy }
-                val totalAmount = buyTradeRecords.fold(BigDecimal.ZERO) { amount, record ->
-                    amount + record.tradeAmount
+        val holdings = allTradeRecords.groupBy(
+            keySelector = {
+                when (it.side) {
+                    Side.Buy -> it.symbol.first
+                    Side.Sell -> it.symbol.second
                 }
-                val totalCost = buyTradeRecords.fold(BigDecimal.ZERO) { cost, record ->
-                    cost + when (record.symbol.second) {
-                        Asset("JPY") -> record.tradePrice.multiply(record.tradeAmount)
-                        else -> {
-                            val costQuote = record.tradePrice.multiply(record.tradeAmount)
-                            costQuote.multiply(getNearestBtcJpyPrice(record.tradedAt))
+            },
+            valueTransform = {
+                when (it.side) {
+                    Side.Buy -> {
+                        if (it.symbol.second == Asset.single("JPY")) {
+                            it.tradePrice to it.tradeAmount
+                        } else {
+                            val jpyPrice = it.tradePrice.multiply(getNearestBtcJpyPrice(it.tradedAt))
+                            jpyPrice to it.tradeAmount
+                        }
+                    }
+                    Side.Sell -> {
+                        if (it.symbol.second == Asset.single("BTC")) {
+                            val btcAmount = it.tradePrice.multiply(it.tradeAmount)
+                            val jpyAmount = btcAmount.multiply(getNearestBtcJpyPrice(it.tradedAt))
+                            val jpyPrice = jpyAmount.div(btcAmount)
+                            jpyPrice to btcAmount
+                        } else {
+                            BigDecimal.ZERO to BigDecimal.ZERO
                         }
                     }
                 }
-                return@mapValues Holding(
-                    amount = totalAmount,
-                    averagePrice = totalCost.div(totalAmount)
-                )
             }
-
-        holdings.forEach {
-            println(it)
+        ).mapValues { entry ->
+            val totalCost = entry.value.fold(BigDecimal.ZERO) { total, pair ->
+                total + pair.first.multiply(pair.second)
+            }
+            val totalAmount = entry.value.fold(BigDecimal.ZERO) { total, pair ->
+                total + pair.second
+            }
+            return@mapValues Holding(
+                amount = totalAmount,
+                averagePrice = if (totalAmount == BigDecimal.ZERO) {
+                    BigDecimal.ZERO
+                } else {
+                    totalCost.div(totalAmount)
+                }
+            )
         }
+
+        holdings.forEach { println(it) }
 
         allTradeRecords
             .filter { it.tradedAt.year == 2017 }
@@ -70,8 +92,6 @@ object TotalAverageMethod {
                                 value = costQuote.multiply(getNearestBtcJpyPrice(it.tradedAt)) - costQuote.multiply(holding.averagePrice)
                             )
                             println(profitLoss)
-                        } else {
-                            println("Skipped! $it")
                         }
                     }
                     Side.Sell -> {
