@@ -10,6 +10,7 @@ import model.TradeRecord
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @Serializable
@@ -29,7 +30,7 @@ data class TradeResponse(
     }
     fun toTradeRecord(pair: Pair<Asset, Asset>): TradeRecord {
         return TradeRecord(
-            tradedAt = LocalDateTime.parse(date, FORMATTER).atZone(ZoneId.systemDefault()),
+            tradedAt = LocalDateTime.parse(date, FORMATTER).atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault()),
             symbol = Symbol.from(pair),
             side = Side.from(type),
             tradePrice = rate,
