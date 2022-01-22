@@ -84,12 +84,12 @@ object TotalAverageMethod {
                     Side.Buy -> {
                         if (it.symbol.second == Asset.single("BTC")) {
                             val holding = holdings.getValue(it.symbol.second)
-                            val costQuote = it.tradePrice.multiply(it.tradeAmount)
+                            val quoteAmount = it.tradePrice.multiply(it.tradeAmount)
                             val profitLoss = ProfitLoss(
                                 tradedAt = it.tradedAt,
                                 symbol = it.symbol,
                                 side = it.side,
-                                value = costQuote.multiply(getNearestBtcJpyPrice(it.tradedAt)) - costQuote.multiply(holding.averagePrice)
+                                value = quoteAmount.multiply(getNearestBtcJpyPrice(it.tradedAt)) - quoteAmount.multiply(holding.averagePrice)
                             )
                             println(profitLoss)
                         }
@@ -106,12 +106,12 @@ object TotalAverageMethod {
                             println(profitLoss)
                         } else {
                             val holding = holdings.getValue(it.symbol.first)
-                            val costQuote = it.tradePrice.multiply(it.tradeAmount)
+                            val quoteAmount = it.tradePrice.multiply(it.tradeAmount)
                             val profitLoss = ProfitLoss(
                                 tradedAt = it.tradedAt,
                                 symbol = it.symbol,
                                 side = it.side,
-                                value = costQuote.multiply(getNearestBtcJpyPrice(it.tradedAt)) - costQuote.multiply(holding.averagePrice)
+                                value = quoteAmount.multiply(getNearestBtcJpyPrice(it.tradedAt)) - quoteAmount.multiply(holding.averagePrice)
                             )
                             println(profitLoss)
                         }
