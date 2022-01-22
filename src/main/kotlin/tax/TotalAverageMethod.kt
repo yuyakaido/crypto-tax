@@ -86,15 +86,12 @@ object TotalAverageMethod {
                     Side.Buy -> {
                         if (it.symbol.second == Asset.single("BTC")) {
                             val asset = it.symbol.second
-                            val oldHolding = wallet.holdings.getValue(asset)
+                            val holding = wallet.holdings.getValue(asset)
                             val quoteAmount = it.tradePrice.multiply(it.tradeAmount)
-                            val newHolding = oldHolding.copy(
-                                amount = oldHolding.amount.minus(quoteAmount)
-                            )
-                            wallet = wallet.replace(asset, newHolding)
+                            wallet = wallet.minus(asset, quoteAmount)
                             val profitLoss = ProfitLoss(
                                 tradeRecord = it,
-                                value = quoteAmount.multiply(getNearestBtcJpyPrice(it.tradedAt)) - quoteAmount.multiply(oldHolding.averagePrice)
+                                value = quoteAmount.multiply(getNearestBtcJpyPrice(it.tradedAt)) - quoteAmount.multiply(holding.averagePrice)
                             )
                             return@map it.symbol.second to profitLoss
                         } else {
@@ -108,24 +105,18 @@ object TotalAverageMethod {
                     Side.Sell -> {
                         if (it.symbol.second == Asset.single("JPY")) {
                             val asset = it.symbol.first
-                            val oldHolding = wallet.holdings.getValue(asset)
-                            val newHolding = oldHolding.copy(
-                                amount = oldHolding.amount.minus(it.tradeAmount)
-                            )
-                            wallet = wallet.replace(asset, newHolding)
+                            val holding = wallet.holdings.getValue(asset)
+                            wallet = wallet.minus(asset, it.tradeAmount)
                             val profitLoss = ProfitLoss(
                                 tradeRecord = it,
-                                value = it.tradePrice.multiply(it.tradeAmount) - oldHolding.averagePrice.multiply(it.tradeAmount)
+                                value = it.tradePrice.multiply(it.tradeAmount) - holding.averagePrice.multiply(it.tradeAmount)
                             )
                             return@map it.symbol.first to profitLoss
                         } else {
                             val asset = it.symbol.first
-                            val oldHolding = wallet.holdings.getValue(it.symbol.first)
-                            val newHolding = oldHolding.copy(
-                                amount = oldHolding.amount.minus(it.tradeAmount)
-                            )
-                            wallet = wallet.replace(asset, newHolding)
-                            val unitProfit = it.tradePrice.multiply(getNearestBtcJpyPrice(it.tradedAt)) - oldHolding.averagePrice
+                            val holding = wallet.holdings.getValue(it.symbol.first)
+                            wallet = wallet.minus(asset, it.tradeAmount)
+                            val unitProfit = it.tradePrice.multiply(getNearestBtcJpyPrice(it.tradedAt)) - holding.averagePrice
                             val profitLoss = ProfitLoss(
                                 tradeRecord = it,
                                 value = unitProfit.multiply(it.tradeAmount)
@@ -137,7 +128,7 @@ object TotalAverageMethod {
             }
 
         wallet.holdings.forEach {
-            println("${it.key}: ${it.value.amount}")
+            println("${it.key}: ${it.value.amount}: ${it.value.amount.multiply(it.value.averagePrice)}")
         }
 
 //        transactions.groupBy(
