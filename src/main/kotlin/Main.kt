@@ -1,3 +1,4 @@
+import binance.BinanceService
 import bitbank.BitbankService
 import bitflyer.BitflyerService
 import bittrex.BittrexService
@@ -17,6 +18,7 @@ fun main() {
         BitbankService.execute()
         PoloniexService.execute()
         BittrexService.execute()
+        BinanceService.execute()
         BybitService.execute()
         ForeignExchangeService.execute()
         TaxService.execute()
