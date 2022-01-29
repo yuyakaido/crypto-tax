@@ -8,7 +8,10 @@ data class Asset(
 ) {
 
     companion object {
-        private val BASE_ASSETS = listOf("BTC", "USDT", "BUSD", "USDC", "JPY", "USD")
+        private val QUOTABLE_LEGAL_ASSETS = listOf("JPY", "USD")
+        val QUOTABLE_STABLE_ASSETS = listOf("USDT", "BUSD", "USDC")
+        val QUOTABLE_CRYPTO_ASSETS = listOf("BTC", "ETH", "XRP")
+        private val QUOTABLE_ASSETS = QUOTABLE_LEGAL_ASSETS + QUOTABLE_STABLE_ASSETS + QUOTABLE_CRYPTO_ASSETS
 
         private fun sanitize(symbol: String): String {
             return symbol
@@ -57,7 +60,7 @@ data class Asset(
 
         fun second(symbol: String): Asset {
             val sanitizedSymbol = sanitize(symbol)
-            val second = BASE_ASSETS.first { sanitizedSymbol.endsWith(it) }
+            val second = QUOTABLE_ASSETS.first { sanitizedSymbol.endsWith(it) }
             return Asset(second)
         }
     }

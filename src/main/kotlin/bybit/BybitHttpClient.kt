@@ -2,16 +2,15 @@ package bybit
 
 import retrofit2.http.GET
 import retrofit2.http.Query
-import retrofit2.http.QueryMap
 
 interface BybitHttpClient {
     @GET("/v2/private/wallet/withdraw/list")
     suspend fun getWithdrawHistory(): WithdrawHistoryResponse
 
     @GET("/v2/private/exchange-order/list")
-    suspend fun getAssetExchangeHistory(
-        @QueryMap queries: Map<String, String>
-    ): AssetExchangeHistoryResponse
+    suspend fun getExchangeHistory(
+        @Query("from") from: Long? = null
+    ): ExchangeHistoryResponse
 
     @GET("/v2/private/execution/list")
     suspend fun getInversePerpetualTradeHistory(

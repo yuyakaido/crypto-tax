@@ -44,6 +44,13 @@ object BybitService : Service {
 //                records = spotTradeRecords
 //            )
 //        )
+//        val exchangeRecords = BybitDownloader.downloadExchangeRecords()
+//        JsonExporter.export(
+//            TradeHistory(
+//                name = "bybit_exchange_history",
+//                records = exchangeRecords
+//            )
+//        )
     }
 
 }

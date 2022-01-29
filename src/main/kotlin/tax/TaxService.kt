@@ -13,7 +13,7 @@ object TaxService : Service {
     private val btcJpyChartRecords = JsonImporter.importChartRecords("yuyakaido_btc_jpy_chart_history_2017")
 
     override suspend fun execute() {
-        calculate()
+//        calculate()
     }
 
     private fun getNearestBtcJpyPrice(tradedAt: ZonedDateTime): BigDecimal {

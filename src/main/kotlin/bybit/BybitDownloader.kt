@@ -7,10 +7,8 @@ import model.Asset
 import model.Symbol
 import model.TradeRecord
 import model.WithdrawRecord
-import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
 
 @ExperimentalSerializationApi
 object BybitDownloader {
@@ -39,6 +37,23 @@ object BybitDownloader {
 
     suspend fun downloadWithdrawRecords(): List<WithdrawRecord> {
         return client.getWithdrawHistory().toWithdrawRecords()
+    }
+
+    suspend fun downloadExchangeRecords(): List<TradeRecord> {
+        println("Fetching bybit exchange history")
+        val responses = mutableListOf<ExchangeHistoryResponse>()
+        var from: Long? = null
+        while (true) {
+            val response = client.getExchangeHistory(from = from)
+            responses.add(response)
+            if (response.result.size < 20) {
+                break
+            } else {
+                from = response.result.last().id
+            }
+            delay(5000)
+        }
+        return responses.flatMap { it.toTradeRecords() }
     }
 
     suspend fun downloadInversePerpetualTradeRecords(): List<TradeRecord> {
