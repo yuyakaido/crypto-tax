@@ -11,4 +11,11 @@ data class WithdrawRecord(
     @Contextual val asset: Asset,
     @Contextual val amount: BigDecimal,
     @Contextual val fee: BigDecimal
-)
+) : RecordType() {
+    override fun recordedAt(): ZonedDateTime {
+        return withdrawnAt
+    }
+    override fun asset(): Asset {
+        return asset
+    }
+}

@@ -14,4 +14,11 @@ data class TradeRecord(
     @Contextual val tradeAmount: BigDecimal,
     @Contextual val feeAmount: BigDecimal,
     @Contextual val feeAsset: Asset
-)
+) : RecordType() {
+    override fun recordedAt(): ZonedDateTime {
+        return tradedAt
+    }
+    override fun asset(): Asset {
+        return symbol.first
+    }
+}

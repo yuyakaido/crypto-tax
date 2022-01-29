@@ -10,4 +10,11 @@ data class DistributionRecord(
     @Contextual val distributedAt: ZonedDateTime,
     @Contextual val asset: Asset,
     @Contextual val amount: BigDecimal
-)
+) : RecordType() {
+    override fun recordedAt(): ZonedDateTime {
+        return distributedAt
+    }
+    override fun asset(): Asset {
+        return asset
+    }
+}

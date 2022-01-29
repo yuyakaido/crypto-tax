@@ -1,9 +1,9 @@
 package tax
 
-import model.TradeRecord
+import model.RecordType
 import java.math.BigDecimal
 
 data class ProfitLoss(
-    val tradeRecord: TradeRecord,
+    val record: RecordType,
     val value: BigDecimal
 )
