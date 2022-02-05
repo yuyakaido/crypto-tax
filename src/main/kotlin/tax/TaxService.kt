@@ -189,7 +189,11 @@ object TaxService : Service {
                     is DistributionRecord -> {
                         val profitLoss = ProfitLoss(
                             record = it,
-                            value = it.amount.multiply(getNearestBtcJpyPrice(it.distributedAt))
+                            value = when (it.asset) {
+                                Asset.JPY -> it.amount
+                                Asset.BTC -> it.amount.multiply(getNearestBtcJpyPrice(it.distributedAt))
+                                else -> throw IllegalStateException("Unknown asset: ${it.asset}")
+                            }
                         )
                         return@map it.asset to profitLoss
                     }
