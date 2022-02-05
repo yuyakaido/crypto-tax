@@ -1,9 +1,8 @@
 package binance
 
 import common.Service
-import json.DepositHistory
 import json.JsonExporter
-import json.WithdrawHistory
+import json.TradeHistory
 import kotlinx.serialization.ExperimentalSerializationApi
 
 @ExperimentalSerializationApi
@@ -22,6 +21,13 @@ object BinanceService : Service {
 //            WithdrawHistory(
 //                name = "binance_withdraw_history",
 //                records = withdrawRecords
+//            )
+//        )
+//        val spotTradeRecords = BinanceDownloader.downloadSpotTradeHistory()
+//        JsonExporter.export(
+//            TradeHistory(
+//                name = "binance_spot_trade_history",
+//                records = spotTradeRecords
 //            )
 //        )
     }

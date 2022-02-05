@@ -25,4 +25,8 @@ data class Symbol(
     fun toBybitString(): String {
         return "$first$second"
     }
+
+    fun toBinanceString(): String {
+        return "$first$second"
+    }
 }

@@ -2,8 +2,7 @@ package binance
 
 import common.RetrofitCreator
 import kotlinx.serialization.ExperimentalSerializationApi
-import model.DepositRecord
-import model.WithdrawRecord
+import model.*
 
 @ExperimentalSerializationApi
 object BinanceDownloader {
@@ -28,6 +27,16 @@ object BinanceDownloader {
 
     suspend fun downloadWithdrawHistory(): List<WithdrawRecord> {
         return client.getWithdrawHistory().map { it.toWithdrawRecord() }
+    }
+
+    suspend fun downloadSpotTradeHistory(): List<TradeRecord> {
+//        val symbols = client.getSymbols().toSymbols()
+        val symbols = listOf(Symbol.from(Asset.pair("BCCBTC")))
+        val responses = mutableListOf<SpotTradeResponse>()
+        symbols.forEach {
+            responses.addAll(client.getSpotTradeHistory(symbol = it.toBinanceString()))
+        }
+        return responses.map { it.toTradeRecord() }
     }
 
 }

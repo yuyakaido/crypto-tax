@@ -10,28 +10,39 @@ class BinanceHttpInterceptor(
     private val apiSecret: String
 ) : Interceptor {
 
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val targetUrl = chain.request().url
-            .newBuilder()
-            .addEncodedQueryParameter(
-                "timestamp",
-                Instant.now().toEpochMilli().toString()
-            )
-            .build()
-        val signature = Security.generateSignature(
-            apiSecret = apiSecret,
-            target = targetUrl.encodedQuery ?: ""
+    companion object {
+        private val PUBLIC_API_PATH_LIST = listOf(
+            "/api/v3/exchangeInfo"
         )
-        val newUrl = targetUrl
-            .newBuilder()
-            .addEncodedQueryParameter("signature", signature)
-            .build()
-        val newRequest = chain.request()
-            .newBuilder()
-            .url(newUrl)
-            .addHeader("X-MBX-APIKEY", apiKey)
-            .build()
-        return chain.proceed(newRequest)
+    }
+
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val path = chain.request().url.encodedPath
+        if (PUBLIC_API_PATH_LIST.contains(path)) {
+            return chain.proceed(chain.request())
+        } else {
+            val targetUrl = chain.request().url
+                .newBuilder()
+                .addEncodedQueryParameter(
+                    "timestamp",
+                    Instant.now().toEpochMilli().toString()
+                )
+                .build()
+            val signature = Security.generateSignature(
+                apiSecret = apiSecret,
+                target = targetUrl.encodedQuery ?: ""
+            )
+            val newUrl = targetUrl
+                .newBuilder()
+                .addEncodedQueryParameter("signature", signature)
+                .build()
+            val newRequest = chain.request()
+                .newBuilder()
+                .url(newUrl)
+                .addHeader("X-MBX-APIKEY", apiKey)
+                .build()
+            return chain.proceed(newRequest)
+        }
     }
 
 }
