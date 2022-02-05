@@ -19,4 +19,9 @@ data class Wallet(
             }
         )
     }
+    fun addAll(holdings: Map<Asset, Holding>): Wallet {
+        return copy(
+            holdings = this.holdings.plus(holdings)
+        )
+    }
 }

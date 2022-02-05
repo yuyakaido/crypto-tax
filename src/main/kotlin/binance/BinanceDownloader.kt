@@ -50,7 +50,19 @@ object BinanceDownloader {
         symbols.forEach {
             responses.addAll(spotClient.getSpotTradeHistory(symbol = it.toBinanceString()))
         }
-        return responses.map { it.toTradeRecord() }
+        return responses
+            .map { it.toTradeRecord() }
+            .map {
+                if (it.asset() == Asset("BCC")) {
+                    it.copy(
+                        symbol = it.symbol.copy(
+                            first = Asset.single("BCH")
+                        )
+                    )
+                } else {
+                    it
+                }
+            }
     }
 
     suspend fun downloadCoinFutureTradeHistory(): List<TradeRecord> {
