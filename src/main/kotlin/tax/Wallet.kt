@@ -4,7 +4,7 @@ import model.Asset
 import java.math.BigDecimal
 
 data class Wallet(
-    val holdings: Map<Asset, Holding>
+    val holdings: Map<Asset, Holding> = emptyMap()
 ) {
     fun minus(asset: Asset, amount: BigDecimal): Wallet {
         return copy(

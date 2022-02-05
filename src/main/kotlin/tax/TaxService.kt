@@ -5,6 +5,7 @@ import json.JsonImporter
 import kotlinx.serialization.ExperimentalSerializationApi
 import model.*
 import java.math.BigDecimal
+import java.time.Year
 import java.time.ZonedDateTime
 
 @ExperimentalSerializationApi
@@ -12,8 +13,10 @@ object TaxService : Service {
 
     private val btcJpyChartRecords = JsonImporter.importChartRecords("yuyakaido_btc_jpy_chart_history_2017")
 
+    private var wallet = Wallet()
+
     override suspend fun execute() {
-//        calculate()
+        calculate(Year.of(2017))
     }
 
     private fun getNearestBtcJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
@@ -23,7 +26,7 @@ object TaxService : Service {
         }.price
     }
 
-    private fun calculate() {
+    private fun calculate(year: Year) {
         val bitflyerTradeRecords = JsonImporter.importTradeRecords("bitflyer_trade_history")
         val bitflyerDistributionRecords = JsonImporter.importDistributionRecords("bitflyer_distribution_history")
         val bitflyerWithdrawRecords = JsonImporter.importWithdrawRecords("bitflyer_withdraw_history")
@@ -34,81 +37,83 @@ object TaxService : Service {
             .plus(bitflyerWithdrawRecords)
             .plus(bittrexTradeRecords)
             .plus(poloniexTradeRecords)
-            .filter { it.recordedAt().year == 2017 }
+            .filter { it.recordedAt().year == year.value }
             .sortedBy { it.recordedAt() }
 
-        var wallet = Wallet(
-            holdings = allRecords.groupBy(
-                keySelector = {
-                    when (it) {
-                        is TradeRecord -> {
-                            when (it.side) {
-                                Side.Buy -> it.symbol.first
-                                Side.Sell -> it.symbol.second
-                            }
-                        }
-                        is DistributionRecord -> {
-                            it.asset
-                        }
-                        is WithdrawRecord -> {
-                            it.asset
-                        }
-                    }
-                },
-                valueTransform = {
-                    when (it) {
-                        is TradeRecord -> {
-                            when (it.side) {
-                                Side.Buy -> {
-                                    if (it.symbol.second == Asset.single("JPY")) {
-                                        it.tradePrice to it.tradeAmount
-                                    } else {
-                                        val jpyPrice = it.tradePrice.multiply(getNearestBtcJpyPrice(it.tradedAt))
-                                        jpyPrice to it.tradeAmount
-                                    }
-                                }
-                                Side.Sell -> {
-                                    if (it.symbol.second == Asset.single("BTC")) {
-                                        val btcAmount = it.tradePrice.multiply(it.tradeAmount)
-                                        val jpyAmount = btcAmount.multiply(getNearestBtcJpyPrice(it.tradedAt))
-                                        val jpyPrice = jpyAmount.div(btcAmount)
-                                        jpyPrice to btcAmount
-                                    } else {
-                                        BigDecimal.ZERO to BigDecimal.ZERO
-                                    }
+        if (wallet.holdings.isEmpty()) {
+            wallet = wallet.copy(
+                holdings = allRecords.groupBy(
+                    keySelector = {
+                        when (it) {
+                            is TradeRecord -> {
+                                when (it.side) {
+                                    Side.Buy -> it.symbol.first
+                                    Side.Sell -> it.symbol.second
                                 }
                             }
+                            is DistributionRecord -> {
+                                it.asset
+                            }
+                            is WithdrawRecord -> {
+                                it.asset
+                            }
                         }
-                        is DistributionRecord -> {
-                            BigDecimal.ZERO to it.amount
-                        }
-                        is WithdrawRecord -> {
-                            BigDecimal.ZERO to BigDecimal.ZERO
+                    },
+                    valueTransform = {
+                        when (it) {
+                            is TradeRecord -> {
+                                when (it.side) {
+                                    Side.Buy -> {
+                                        if (it.symbol.second == Asset.single("JPY")) {
+                                            it.tradePrice to it.tradeAmount
+                                        } else {
+                                            val jpyPrice = it.tradePrice.multiply(getNearestBtcJpyPrice(it.tradedAt))
+                                            jpyPrice to it.tradeAmount
+                                        }
+                                    }
+                                    Side.Sell -> {
+                                        if (it.symbol.second == Asset.single("BTC")) {
+                                            val btcAmount = it.tradePrice.multiply(it.tradeAmount)
+                                            val jpyAmount = btcAmount.multiply(getNearestBtcJpyPrice(it.tradedAt))
+                                            val jpyPrice = jpyAmount.div(btcAmount)
+                                            jpyPrice to btcAmount
+                                        } else {
+                                            BigDecimal.ZERO to BigDecimal.ZERO
+                                        }
+                                    }
+                                }
+                            }
+                            is DistributionRecord -> {
+                                BigDecimal.ZERO to it.amount
+                            }
+                            is WithdrawRecord -> {
+                                BigDecimal.ZERO to BigDecimal.ZERO
+                            }
                         }
                     }
-                }
-            ).mapValues { entry ->
-                val totalCost = entry.value.fold(BigDecimal.ZERO) { total, pair ->
-                    total + pair.first.multiply(pair.second)
-                }
-                val totalAmount = entry.value.fold(BigDecimal.ZERO) { total, pair ->
-                    total + pair.second
-                }
-                return@mapValues Holding(
-                    amount = totalAmount,
-                    averagePrice = if (totalAmount == BigDecimal.ZERO) {
-                        BigDecimal.ZERO
-                    } else {
-                        totalCost.div(totalAmount)
+                ).mapValues { entry ->
+                    val totalCost = entry.value.fold(BigDecimal.ZERO) { total, pair ->
+                        total + pair.first.multiply(pair.second)
                     }
-                )
-            }
-        )
+                    val totalAmount = entry.value.fold(BigDecimal.ZERO) { total, pair ->
+                        total + pair.second
+                    }
+                    return@mapValues Holding(
+                        amount = totalAmount,
+                        averagePrice = if (totalAmount == BigDecimal.ZERO) {
+                            BigDecimal.ZERO
+                        } else {
+                            totalCost.div(totalAmount)
+                        }
+                    )
+                }
+            )
+        }
 
         wallet.holdings.forEach { println(it) }
 
         val transactions = allRecords
-            .filter { it.recordedAt().year == 2017 }
+            .filter { it.recordedAt().year == year.value }
             .map {
                 when (it) {
                     is TradeRecord -> {
