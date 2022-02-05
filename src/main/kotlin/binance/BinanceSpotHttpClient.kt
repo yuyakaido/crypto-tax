@@ -3,7 +3,7 @@ package binance
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface BinanceHttpClient {
+interface BinanceSpotHttpClient {
 
     @GET("sapi/v1/capital/deposit/hisrec")
     suspend fun getDepositHistory(): List<DepositResponse>

@@ -30,6 +30,16 @@ object BinanceService : Service {
 //                records = spotTradeRecords
 //            )
 //        )
+//        val coinFutureTradeRecords = BinanceDownloader.downloadCoinFutureTradeHistory()
+//        coinFutureTradeRecords.forEach { println(it) }
+//        JsonExporter.export(
+//            TradeHistory(
+//                name = "binance_coin_future_trade_history",
+//                records = coinFutureTradeRecords
+//            )
+//        )
+//        val incomeRecords = BinanceDownloader.downloadCoinFutureIncomeHistory()
+//        incomeRecords.forEach { println(it) }
     }
 
 }

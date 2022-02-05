@@ -3,13 +3,16 @@ package binance
 import common.RetrofitCreator
 import kotlinx.serialization.ExperimentalSerializationApi
 import model.*
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 @ExperimentalSerializationApi
 object BinanceDownloader {
 
     private val apiKey = System.getProperty("BINANCE_API_KEY")
     private val apiSecret = System.getProperty("BINANCE_API_SECRET")
-    private val client = RetrofitCreator
+    private val spotClient = RetrofitCreator
         .newInstance(
             baseUrl = "https://api.binance.com/",
             interceptors = listOf(
@@ -19,14 +22,25 @@ object BinanceDownloader {
                 )
             )
         )
-        .create(BinanceHttpClient::class.java)
+        .create(BinanceSpotHttpClient::class.java)
+    private val derivativeClient = RetrofitCreator
+        .newInstance(
+            baseUrl = "https://dapi.binance.com/",
+            interceptors = listOf(
+                BinanceHttpInterceptor(
+                    apiKey = apiKey,
+                    apiSecret = apiSecret
+                )
+            )
+        )
+        .create(BinanceDerivativeHttpClient::class.java)
 
     suspend fun downloadDepositHistory(): List<DepositRecord> {
-        return client.getDepositHistory().map { it.toDepositRecord() }
+        return spotClient.getDepositHistory().map { it.toDepositRecord() }
     }
 
     suspend fun downloadWithdrawHistory(): List<WithdrawRecord> {
-        return client.getWithdrawHistory().map { it.toWithdrawRecord() }
+        return spotClient.getWithdrawHistory().map { it.toWithdrawRecord() }
     }
 
     suspend fun downloadSpotTradeHistory(): List<TradeRecord> {
@@ -34,9 +48,44 @@ object BinanceDownloader {
         val symbols = listOf(Symbol.from(Asset.pair("BCCBTC")))
         val responses = mutableListOf<SpotTradeResponse>()
         symbols.forEach {
-            responses.addAll(client.getSpotTradeHistory(symbol = it.toBinanceString()))
+            responses.addAll(spotClient.getSpotTradeHistory(symbol = it.toBinanceString()))
         }
         return responses.map { it.toTradeRecord() }
+    }
+
+    suspend fun downloadCoinFutureTradeHistory(): List<TradeRecord> {
+        val symbols = listOf(
+            "DOTUSD_PERP",
+            "EGLDUSD_PERP",
+            "LTCUSD_PERP",
+            "BCHUSD_PERP",
+            "DOGEUSD_PERP",
+            "ADAUSD_PERP"
+        )
+        val startTime = ZonedDateTime.of(
+            LocalDateTime.of(2021, 1, 1, 0, 0, 0),
+            ZoneOffset.UTC
+        )
+        val responses = mutableListOf<FutureTradeResponse>()
+        symbols.forEach {
+            responses.addAll(
+                derivativeClient.getCoinFutureTradeHistory(
+                    symbol = it,
+                    startTime = startTime.toInstant().toEpochMilli()
+                )
+            )
+        }
+        return responses.map { it.toTradeRecord() }
+    }
+
+    suspend fun downloadCoinFutureIncomeHistory(): List<IncomeResponse> {
+        val startTime = ZonedDateTime.of(
+            LocalDateTime.of(2021, 1, 1, 0, 0, 0),
+            ZoneOffset.UTC
+        )
+        return derivativeClient.getCoinFutureIncomeHistory(
+            startTime = startTime.toInstant().toEpochMilli()
+        )
     }
 
 }
