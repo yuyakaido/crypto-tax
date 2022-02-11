@@ -1,6 +1,7 @@
 package binance
 
 import common.Service
+import json.DistributionHistory
 import json.JsonExporter
 import json.TradeHistory
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -31,15 +32,19 @@ object BinanceService : Service {
 //            )
 //        )
 //        val coinFutureTradeRecords = BinanceDownloader.downloadCoinFutureTradeHistory()
-//        coinFutureTradeRecords.forEach { println(it) }
 //        JsonExporter.export(
 //            TradeHistory(
 //                name = "binance_coin_future_trade_history",
 //                records = coinFutureTradeRecords
 //            )
 //        )
-//        val incomeRecords = BinanceDownloader.downloadCoinFutureIncomeHistory()
-//        incomeRecords.forEach { println(it) }
+//        val interestDistributionRecords = BinanceDownloader.downloadInterestHistory()
+//        JsonExporter.export(
+//            DistributionHistory(
+//                name = "binance_interest_distribution_history",
+//                records = interestDistributionRecords
+//            )
+//        )
     }
 
 }

@@ -19,4 +19,12 @@ interface BinanceSpotHttpClient {
         @Query("symbol") symbol: String
     ): List<SpotTradeResponse>
 
+    @GET("sapi/v1/lending/union/interestHistory")
+    suspend fun getInterestHistory(
+        @Query("lendingType") lendingType: String,
+        @Query("startTime") startTime: Long,
+        @Query("endTime") endTime: Long,
+        @Query("size") size: Long = 100
+    ): List<InterestResponse>
+
 }
