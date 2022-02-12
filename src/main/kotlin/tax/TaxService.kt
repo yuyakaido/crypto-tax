@@ -25,6 +25,17 @@ object TaxService : Service {
         (2017..2021).forEach { calculate(Year.of(it)) }
     }
 
+    private fun getNearestJpyPrice(asset: Asset, tradedAt: ZonedDateTime): BigDecimal {
+        return when (asset) {
+            Asset.BTC -> getNearestBtcJpyPrice(tradedAt)
+            Asset.ETH -> getNearestEthJpyPrice(tradedAt)
+            Asset.XRP -> getNearestXrpJpyPrice(tradedAt)
+            Asset.EOS -> getNearestEosJpyPrice(tradedAt)
+            Asset.DOT -> getNearestDotJpyPrice(tradedAt)
+            else -> throw RuntimeException("Unknown asset: $asset")
+        }
+    }
+
     private fun getNearestBtcJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
         val range = tradedAt to tradedAt.plusMinutes(5)
         return btcJpyChartRecords.first {
@@ -107,28 +118,13 @@ object TaxService : Service {
                         is TradeRecord -> {
                             when (it.side) {
                                 Side.Buy -> {
-                                    when (it.symbol.second) {
+                                    when (val quoteAsset = it.symbol.second) {
                                         Asset.JPY -> {
                                             it.tradePrice to it.tradeAmount
                                         }
-                                        Asset.BTC -> {
-                                            val jpyPrice = it.tradePrice.multiply(getNearestBtcJpyPrice(it.tradedAt))
-                                            jpyPrice to it.tradeAmount
-                                        }
-                                        Asset.ETH -> {
-                                            val jpyPrice = it.tradePrice.multiply(getNearestEthJpyPrice(it.tradedAt))
-                                            jpyPrice to it.tradeAmount
-                                        }
-                                        Asset.XRP -> {
-                                            val jpyPrice = it.tradePrice.multiply(getNearestXrpJpyPrice(it.tradedAt))
-                                            jpyPrice to it.tradeAmount
-                                        }
-                                        Asset.EOS -> {
-                                            val jpyPrice = it.tradePrice.multiply(getNearestEosJpyPrice(it.tradedAt))
-                                            jpyPrice to it.tradeAmount
-                                        }
-                                        Asset.DOT -> {
-                                            val jpyPrice = it.tradePrice.multiply(getNearestDotJpyPrice(it.tradedAt))
+                                        Asset.BTC, Asset.ETH, Asset.XRP, Asset.EOS, Asset.DOT -> {
+                                            val nearestJpyPrice = getNearestJpyPrice(quoteAsset, it.tradedAt)
+                                            val jpyPrice = it.tradePrice.multiply(nearestJpyPrice)
                                             jpyPrice to it.tradeAmount
                                         }
                                         Asset.USDT, Asset.BUSD, Asset.USDC -> {
@@ -206,32 +202,35 @@ object TaxService : Service {
                     is TradeRecord -> {
                         when (it.side) {
                             Side.Buy -> {
-                                if (it.symbol.second == Asset.BTC) {
-                                    val asset = it.symbol.second
-                                    val holding = wallet.holdings.getValue(asset)
-                                    val quoteAmount = it.tradePrice.multiply(it.tradeAmount)
-                                    wallet = wallet.minus(asset, quoteAmount)
-                                    wallet = wallet.minus(it.feeAsset, it.feeAmount)
-                                    val profitLoss = ProfitLoss(
-                                        record = it,
-                                        value = quoteAmount.multiply(getNearestBtcJpyPrice(it.tradedAt)) - quoteAmount.multiply(holding.averagePrice)
-                                    )
-                                    return@map it.symbol.second to profitLoss
-                                } else {
-                                    wallet = wallet.minus(it.feeAsset, it.feeAmount)
-                                    val profitLoss = ProfitLoss(
-                                        record = it,
-                                        value = BigDecimal.ZERO
-                                    )
-                                    return@map it.symbol.first to profitLoss
+                                when (val asset = it.symbol.second) {
+                                    Asset.BTC, Asset.ETH, Asset.XRP, Asset.EOS, Asset.DOT -> {
+                                        val holding = wallet.holdings.getValue(asset)
+                                        val quoteAmount = it.tradePrice.multiply(it.tradeAmount)
+                                        wallet = wallet.minus(asset, quoteAmount)
+                                        wallet = wallet.minus(it.feeAsset, it.feeAmount)
+                                        val nearestJpyPrice = getNearestJpyPrice(asset, it.tradedAt)
+                                        val profitLoss = ProfitLoss(
+                                            record = it,
+                                            value = quoteAmount.multiply(nearestJpyPrice) - quoteAmount.multiply(holding.averagePrice)
+                                        )
+                                        return@map it.symbol.second to profitLoss
+                                    }
+                                    else -> {
+                                        wallet = wallet.minus(it.feeAsset, it.feeAmount)
+                                        val profitLoss = ProfitLoss(
+                                            record = it,
+                                            value = BigDecimal.ZERO
+                                        )
+                                        return@map it.symbol.first to profitLoss
+                                    }
                                 }
                             }
                             Side.Sell -> {
-                                when (it.symbol.second) {
+                                when (val quoteAsset = it.symbol.second) {
                                     Asset.JPY -> {
-                                        val asset = it.symbol.first
-                                        val holding = wallet.holdings.getValue(asset)
-                                        wallet = wallet.minus(asset, it.tradeAmount)
+                                        val baseAsset = it.symbol.first
+                                        val holding = wallet.holdings.getValue(baseAsset)
+                                        wallet = wallet.minus(baseAsset, it.tradeAmount)
                                         wallet = wallet.minus(it.feeAsset, it.feeAmount)
                                         val profitLoss = ProfitLoss(
                                             record = it,
@@ -239,12 +238,13 @@ object TaxService : Service {
                                         )
                                         return@map it.symbol.first to profitLoss
                                     }
-                                    Asset.BTC -> {
-                                        val asset = it.symbol.first
+                                    Asset.BTC, Asset.ETH, Asset.XRP, Asset.EOS, Asset.DOT -> {
+                                        val baseAsset = it.symbol.first
                                         val holding = wallet.holdings.getValue(it.symbol.first)
-                                        wallet = wallet.minus(asset, it.tradeAmount)
+                                        wallet = wallet.minus(baseAsset, it.tradeAmount)
                                         wallet = wallet.minus(it.feeAsset, it.feeAmount)
-                                        val unitProfit = it.tradePrice.multiply(getNearestBtcJpyPrice(it.tradedAt)) - holding.averagePrice
+                                        val nearestJpyPrice = getNearestJpyPrice(quoteAsset, it.tradedAt)
+                                        val unitProfit = it.tradePrice.multiply(nearestJpyPrice) - holding.averagePrice
                                         val profitLoss = ProfitLoss(
                                             record = it,
                                             value = unitProfit.multiply(it.tradeAmount)
@@ -252,9 +252,9 @@ object TaxService : Service {
                                         return@map it.symbol.first to profitLoss
                                     }
                                     Asset.USDT, Asset.BUSD, Asset.USDC -> {
-                                        val asset = it.symbol.first
+                                        val baseAsset = it.symbol.first
                                         val holding = wallet.holdings.getValue(it.symbol.first)
-                                        wallet = wallet.minus(asset, it.tradeAmount)
+                                        wallet = wallet.minus(baseAsset, it.tradeAmount)
                                         wallet = wallet.minus(it.feeAsset, it.feeAmount)
                                         val unitProfit = it.tradePrice.multiply(getNearestUsdJpyPrice(it.tradedAt)) - holding.averagePrice
                                         return@map it.symbol.first to ProfitLoss(
