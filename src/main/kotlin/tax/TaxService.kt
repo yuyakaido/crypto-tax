@@ -32,6 +32,22 @@ object TaxService : Service {
         }.price
     }
 
+    private fun getNearestEthJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
+        return BigDecimal("200000")
+    }
+
+    private fun getNearestXrpJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
+        return BigDecimal("100")
+    }
+
+    private fun getNearestEosJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
+        return BigDecimal("400")
+    }
+
+    private fun getNearestDotJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
+        return BigDecimal("3000")
+    }
+
     private fun getNearestUsdJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
         return usdJpyChartRecords.firstOrNull() {
             it.date == tradedAt.toLocalDate()
@@ -52,6 +68,7 @@ object TaxService : Service {
         val bitbankTradeRecords = JsonImporter.importTradeRecords("bitbank_trade_history")
         val binanceSpotTradeRecords = JsonImporter.importTradeRecords("binance_spot_trade_history")
         val binanceDistributionRecords = JsonImporter.importDistributionRecords("binance_distribution_history")
+        val bybitExchangeTradeRecords = JsonImporter.importTradeRecords("bybit_exchange_history")
         val allRecords = bitflyerTradeRecords
             .plus(bitflyerDistributionRecords)
             .plus(bitflyerWithdrawRecords)
@@ -63,6 +80,7 @@ object TaxService : Service {
             .plus(bitbankTradeRecords)
             .plus(binanceSpotTradeRecords)
             .plus(binanceDistributionRecords)
+            .plus(bybitExchangeTradeRecords)
             .filter { it.recordedAt().year == year.value }
             .sortedBy { it.recordedAt() }
 
@@ -95,6 +113,22 @@ object TaxService : Service {
                                         }
                                         Asset.BTC -> {
                                             val jpyPrice = it.tradePrice.multiply(getNearestBtcJpyPrice(it.tradedAt))
+                                            jpyPrice to it.tradeAmount
+                                        }
+                                        Asset.ETH -> {
+                                            val jpyPrice = it.tradePrice.multiply(getNearestEthJpyPrice(it.tradedAt))
+                                            jpyPrice to it.tradeAmount
+                                        }
+                                        Asset.XRP -> {
+                                            val jpyPrice = it.tradePrice.multiply(getNearestXrpJpyPrice(it.tradedAt))
+                                            jpyPrice to it.tradeAmount
+                                        }
+                                        Asset.EOS -> {
+                                            val jpyPrice = it.tradePrice.multiply(getNearestEosJpyPrice(it.tradedAt))
+                                            jpyPrice to it.tradeAmount
+                                        }
+                                        Asset.DOT -> {
+                                            val jpyPrice = it.tradePrice.multiply(getNearestDotJpyPrice(it.tradedAt))
                                             jpyPrice to it.tradeAmount
                                         }
                                         Asset.USDT, Asset.BUSD, Asset.USDC -> {

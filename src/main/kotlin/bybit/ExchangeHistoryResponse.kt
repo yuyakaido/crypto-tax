@@ -35,31 +35,9 @@ data class ExchangeHistoryResponse(
                 tradedAt = LocalDateTime.parse(it.createdAt, formatter)
                     .atZone(ZoneOffset.UTC)
                     .withZoneSameInstant(ZoneId.systemDefault()),
-                symbol = when {
-                    Asset.QUOTABLE_STABLE_ASSETS.contains(it.fromCoin) -> {
-                        Symbol.from(Asset.single(it.toCoin) to Asset.single(it.fromCoin))
-                    }
-                    Asset.QUOTABLE_STABLE_ASSETS.contains(it.toCoin) -> {
-                        Symbol.from(Asset.single(it.fromCoin) to Asset.single(it.toCoin))
-                    }
-                    Asset.QUOTABLE_CRYPTO_ASSETS.contains(it.fromCoin) -> {
-                        Symbol.from(Asset.single(it.toCoin) to Asset.single(it.fromCoin))
-                    }
-                    Asset.QUOTABLE_CRYPTO_ASSETS.contains(it.toCoin) -> {
-                        Symbol.from(Asset.single(it.fromCoin) to Asset.single(it.toCoin))
-                    }
-                    else -> {
-                        throw IllegalStateException("Unknown symbol: from = ${it.fromCoin}, to = ${it.toCoin}")
-                    }
-                },
-                side = when {
-                    Asset.QUOTABLE_STABLE_ASSETS.contains(it.fromCoin) -> Side.Buy
-                    Asset.QUOTABLE_STABLE_ASSETS.contains(it.toCoin) -> Side.Sell
-                    Asset.QUOTABLE_CRYPTO_ASSETS.contains(it.fromCoin) -> Side.Buy
-                    Asset.QUOTABLE_CRYPTO_ASSETS.contains(it.toCoin) -> Side.Sell
-                    else -> throw IllegalStateException("Failed to detect side: from = ${it.fromCoin}, to = ${it.toCoin}")
-                },
-                tradePrice = it.exchangeRate,
+                symbol = Symbol.from(Asset.single(it.toCoin) to Asset.single(it.fromCoin)),
+                side = Side.Buy,
+                tradePrice = it.toAmount.div(it.exchangeRate).div(it.toAmount),
                 tradeAmount = it.toAmount,
                 feeAmount = it.fromFee,
                 feeAsset = Asset.single(it.fromCoin)

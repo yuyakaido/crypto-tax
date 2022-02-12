@@ -40,7 +40,8 @@ object BybitDownloader {
     }
 
     suspend fun downloadExchangeRecords(): List<TradeRecord> {
-        println("Fetching bybit exchange history")
+        println("Downloading bybit exchange history")
+
         val responses = mutableListOf<ExchangeHistoryResponse>()
         var from: Long? = null
         while (true) {
@@ -53,6 +54,7 @@ object BybitDownloader {
             }
             delay(5000)
         }
+
         return responses.flatMap { it.toTradeRecords() }
     }
 
