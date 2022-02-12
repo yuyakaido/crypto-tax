@@ -33,9 +33,9 @@ object TaxService : Service {
     }
 
     private fun getNearestUsdJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
-        return usdJpyChartRecords.first {
+        return usdJpyChartRecords.firstOrNull() {
             it.date == tradedAt.toLocalDate()
-        }.price
+        }?.price ?: BigDecimal(115)
     }
 
     private fun calculate(year: Year) {
@@ -51,6 +51,7 @@ object TaxService : Service {
         val poloniexWithdrawRecords = JsonImporter.importWithdrawRecords("poloniex_withdraw_history")
         val bitbankTradeRecords = JsonImporter.importTradeRecords("bitbank_trade_history")
         val binanceSpotTradeRecords = JsonImporter.importTradeRecords("binance_spot_trade_history")
+        val binanceDistributionRecords = JsonImporter.importDistributionRecords("binance_distribution_history")
         val allRecords = bitflyerTradeRecords
             .plus(bitflyerDistributionRecords)
             .plus(bitflyerWithdrawRecords)
@@ -61,6 +62,7 @@ object TaxService : Service {
             .plus(poloniexWithdrawRecords)
             .plus(bitbankTradeRecords)
             .plus(binanceSpotTradeRecords)
+            .plus(binanceDistributionRecords)
             .filter { it.recordedAt().year == year.value }
             .sortedBy { it.recordedAt() }
 
@@ -87,21 +89,40 @@ object TaxService : Service {
                         is TradeRecord -> {
                             when (it.side) {
                                 Side.Buy -> {
-                                    if (it.symbol.second == Asset.JPY) {
-                                        it.tradePrice to it.tradeAmount
-                                    } else {
-                                        val jpyPrice = it.tradePrice.multiply(getNearestBtcJpyPrice(it.tradedAt))
-                                        jpyPrice to it.tradeAmount
+                                    when (it.symbol.second) {
+                                        Asset.JPY -> {
+                                            it.tradePrice to it.tradeAmount
+                                        }
+                                        Asset.BTC -> {
+                                            val jpyPrice = it.tradePrice.multiply(getNearestBtcJpyPrice(it.tradedAt))
+                                            jpyPrice to it.tradeAmount
+                                        }
+                                        Asset.USDT, Asset.BUSD, Asset.USDC -> {
+                                            val jpyPrice = it.tradePrice.multiply(getNearestUsdJpyPrice(it.tradedAt))
+                                            jpyPrice to it.tradeAmount
+                                        }
+                                        else -> {
+                                            throw RuntimeException("Unknown symbol: ${it.symbol}")
+                                        }
                                     }
                                 }
                                 Side.Sell -> {
-                                    if (it.symbol.second == Asset.BTC) {
-                                        val btcAmount = it.tradePrice.multiply(it.tradeAmount)
-                                        val jpyAmount = btcAmount.multiply(getNearestBtcJpyPrice(it.tradedAt))
-                                        val jpyPrice = jpyAmount.div(btcAmount)
-                                        jpyPrice to btcAmount
-                                    } else {
-                                        BigDecimal.ZERO to BigDecimal.ZERO
+                                    when (it.symbol.second) {
+                                        Asset.BTC -> {
+                                            val btcAmount = it.tradePrice.multiply(it.tradeAmount)
+                                            val jpyAmount = btcAmount.multiply(getNearestBtcJpyPrice(it.tradedAt))
+                                            val jpyPrice = jpyAmount.div(btcAmount)
+                                            jpyPrice to btcAmount
+                                        }
+                                        Asset.USDT, Asset.BUSD, Asset.USDC -> {
+                                            val baseAmount = it.tradePrice.multiply(it.tradeAmount)
+                                            val jpyAmount = baseAmount.multiply(getNearestUsdJpyPrice(it.tradedAt))
+                                            val jpyPrice = jpyAmount.div(baseAmount)
+                                            jpyPrice to baseAmount
+                                        }
+                                        else -> {
+                                            BigDecimal.ZERO to BigDecimal.ZERO
+                                        }
                                     }
                                 }
                             }

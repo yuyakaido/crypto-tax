@@ -17,7 +17,7 @@ data class Asset(
         private val QUOTABLE_LEGAL_ASSETS = listOf("JPY", "USD")
         val QUOTABLE_STABLE_ASSETS = listOf("USDT", "BUSD", "USDC")
         val QUOTABLE_CRYPTO_ASSETS = listOf("BTC", "ETH", "XRP", "BNB")
-        private val QUOTABLE_ASSETS = QUOTABLE_LEGAL_ASSETS + QUOTABLE_STABLE_ASSETS + QUOTABLE_CRYPTO_ASSETS
+        private val QUOTABLE_ASSETS = QUOTABLE_CRYPTO_ASSETS + QUOTABLE_STABLE_ASSETS + QUOTABLE_LEGAL_ASSETS
 
         private fun sanitize(symbol: String): String {
             return symbol
