@@ -15,11 +15,12 @@ object TaxService : Service {
         .plus(JsonImporter.importChartRecords("yuyakaido_btc_jpy_chart_history_2018"))
         .plus(JsonImporter.importChartRecords("yuyakaido_btc_jpy_chart_history_2019"))
         .plus(JsonImporter.importChartRecords("yuyakaido_btc_jpy_chart_history_2020"))
+        .plus(JsonImporter.importChartRecords("yuyakaido_btc_jpy_chart_history_2021"))
 
     private var wallet = Wallet()
 
     override suspend fun execute() {
-        (2017..2020).forEach { calculate(Year.of(it)) }
+        (2017..2021).forEach { calculate(Year.of(it)) }
     }
 
     private fun getNearestBtcJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
@@ -38,6 +39,7 @@ object TaxService : Service {
         val bittrexTradeRecords = JsonImporter.importTradeRecords("bittrex_trade_history")
         val bittrexWithdrawRecords = JsonImporter.importWithdrawRecords("bittrex_withdraw_history")
         val poloniexTradeRecords = JsonImporter.importTradeRecords("poloniex_trade_history")
+        val poloniexDistributionRecords = JsonImporter.importDistributionRecords("poloniex_distribution_history")
         val poloniexWithdrawRecords = JsonImporter.importWithdrawRecords("poloniex_withdraw_history")
         val bitbankTradeRecords = JsonImporter.importTradeRecords("bitbank_trade_history")
         val binanceSpotTradeRecords = JsonImporter.importTradeRecords("binance_spot_trade_history")
@@ -47,6 +49,7 @@ object TaxService : Service {
             .plus(bittrexTradeRecords)
             .plus(bittrexWithdrawRecords)
             .plus(poloniexTradeRecords)
+            .plus(poloniexDistributionRecords)
             .plus(poloniexWithdrawRecords)
             .plus(bitbankTradeRecords)
             .plus(binanceSpotTradeRecords)
@@ -76,7 +79,7 @@ object TaxService : Service {
                         is TradeRecord -> {
                             when (it.side) {
                                 Side.Buy -> {
-                                    if (it.symbol.second == Asset.single("JPY")) {
+                                    if (it.symbol.second == Asset.JPY) {
                                         it.tradePrice to it.tradeAmount
                                     } else {
                                         val jpyPrice = it.tradePrice.multiply(getNearestBtcJpyPrice(it.tradedAt))
@@ -84,7 +87,7 @@ object TaxService : Service {
                                     }
                                 }
                                 Side.Sell -> {
-                                    if (it.symbol.second == Asset.single("BTC")) {
+                                    if (it.symbol.second == Asset.BTC) {
                                         val btcAmount = it.tradePrice.multiply(it.tradeAmount)
                                         val jpyAmount = btcAmount.multiply(getNearestBtcJpyPrice(it.tradedAt))
                                         val jpyPrice = jpyAmount.div(btcAmount)
@@ -140,7 +143,7 @@ object TaxService : Service {
                     is TradeRecord -> {
                         when (it.side) {
                             Side.Buy -> {
-                                if (it.symbol.second == Asset.single("BTC")) {
+                                if (it.symbol.second == Asset.BTC) {
                                     val asset = it.symbol.second
                                     val holding = wallet.holdings.getValue(asset)
                                     val quoteAmount = it.tradePrice.multiply(it.tradeAmount)
@@ -161,7 +164,7 @@ object TaxService : Service {
                                 }
                             }
                             Side.Sell -> {
-                                if (it.symbol.second == Asset.single("JPY")) {
+                                if (it.symbol.second == Asset.JPY) {
                                     val asset = it.symbol.first
                                     val holding = wallet.holdings.getValue(asset)
                                     wallet = wallet.minus(asset, it.tradeAmount)
@@ -171,7 +174,7 @@ object TaxService : Service {
                                         value = it.tradePrice.multiply(it.tradeAmount) - holding.averagePrice.multiply(it.tradeAmount)
                                     )
                                     return@map it.symbol.first to profitLoss
-                                } else {
+                                } else if (it.symbol.second == Asset.BTC) {
                                     val asset = it.symbol.first
                                     val holding = wallet.holdings.getValue(it.symbol.first)
                                     wallet = wallet.minus(asset, it.tradeAmount)
@@ -182,6 +185,11 @@ object TaxService : Service {
                                         value = unitProfit.multiply(it.tradeAmount)
                                     )
                                     return@map it.symbol.first to profitLoss
+                                } else {
+                                    return@map it.symbol.first to ProfitLoss(
+                                        record = it,
+                                        value = BigDecimal.ZERO
+                                    )
                                 }
                             }
                         }
@@ -192,7 +200,7 @@ object TaxService : Service {
                             value = when (it.asset) {
                                 Asset.JPY -> it.amount
                                 Asset.BTC -> it.amount.multiply(getNearestBtcJpyPrice(it.distributedAt))
-                                else -> throw IllegalStateException("Unknown asset: ${it.asset}")
+                                else -> BigDecimal.ZERO
                             }
                         )
                         return@map it.asset to profitLoss
@@ -202,7 +210,7 @@ object TaxService : Service {
                         val profitLoss = ProfitLoss(
                             record = it,
                             value = when (it.asset) {
-                                Asset.single("BTC") -> {
+                                Asset.BTC -> {
                                     -it.fee.multiply(getNearestBtcJpyPrice(it.withdrawnAt))
                                 }
                                 else -> {
