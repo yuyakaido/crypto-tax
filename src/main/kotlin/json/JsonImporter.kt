@@ -3,13 +3,19 @@ package json
 import common.RetrofitCreator
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
-import model.ChartRecord
-import model.DistributionRecord
-import model.TradeRecord
-import model.WithdrawRecord
+import model.*
 
 @ExperimentalSerializationApi
 object JsonImporter : IO {
+
+    fun importRateRecords(name: String): List<RateRecord> {
+        return RetrofitCreator.getJson().decodeFromString(
+            string = import(
+                name = name,
+                from = IO.Directory.Resources
+            )
+        )
+    }
 
     fun importChartRecords(name: String): List<ChartRecord> {
         return RetrofitCreator.getJson().decodeFromString(

@@ -10,6 +10,9 @@ data class Asset(
     companion object {
         val JPY = single("JPY")
         val BTC = single("BTC")
+        val USDT = single("USDT")
+        val BUSD = single("BUSD")
+        val USDC = single("USDC")
 
         private val QUOTABLE_LEGAL_ASSETS = listOf("JPY", "USD")
         val QUOTABLE_STABLE_ASSETS = listOf("USDT", "BUSD", "USDC")
