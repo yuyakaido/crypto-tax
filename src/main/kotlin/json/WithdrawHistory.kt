@@ -11,5 +11,6 @@ data class WithdrawHistory(
     override val name: String,
     override val records: List<WithdrawRecord>
 ) : JsonFile<WithdrawRecord> {
-    override val json: JsonElement = RetrofitCreator.getJson().encodeToJsonElement(records)
+    override val json: JsonElement = RetrofitCreator.getJson()
+        .encodeToJsonElement(records.sortedByDescending { it.withdrawnAt })
 }

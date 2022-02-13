@@ -11,5 +11,6 @@ data class DepositHistory(
     override val name: String,
     override val records: List<DepositRecord>
 ) : JsonFile<DepositRecord> {
-    override val json: JsonElement = RetrofitCreator.getJson().encodeToJsonElement(records)
+    override val json: JsonElement = RetrofitCreator.getJson()
+        .encodeToJsonElement(records.sortedByDescending { it.depositedAt })
 }

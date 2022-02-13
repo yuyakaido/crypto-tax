@@ -14,9 +14,10 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @Serializable
-data class ExchangeHistoryResponse(
+data class ExchangeTradeHistoryResponse(
     @SerialName("result") val result: List<Result>
 ) {
+
     @Serializable
     data class Result(
         @SerialName("id") val id: Long,
@@ -28,6 +29,7 @@ data class ExchangeHistoryResponse(
         @SerialName("from_fee") @Contextual val fromFee: BigDecimal,
         @SerialName("created_at") val createdAt: String
     )
+
     fun toTradeRecords(): List<TradeRecord> {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         return result.map {
@@ -44,4 +46,5 @@ data class ExchangeHistoryResponse(
             )
         }
     }
+
 }

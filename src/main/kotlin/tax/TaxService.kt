@@ -22,7 +22,7 @@ object TaxService : Service {
     private var wallet = Wallet()
 
     override suspend fun execute() {
-        (2017..2021).forEach { calculate(Year.of(it)) }
+//        (2017..2021).forEach { calculate(Year.of(it)) }
     }
 
     private fun getNearestJpyPrice(asset: Asset, tradedAt: ZonedDateTime): BigDecimal {
@@ -79,7 +79,7 @@ object TaxService : Service {
         val bitbankTradeRecords = JsonImporter.importTradeRecords("bitbank_trade_history")
         val binanceSpotTradeRecords = JsonImporter.importTradeRecords("binance_spot_trade_history")
         val binanceDistributionRecords = JsonImporter.importDistributionRecords("binance_distribution_history")
-        val bybitExchangeTradeRecords = JsonImporter.importTradeRecords("bybit_exchange_history")
+        val bybitExchangeTradeRecords = JsonImporter.importTradeRecords("bybit_exchange_trade_history")
         val allRecords = bitflyerTradeRecords
             .plus(bitflyerDistributionRecords)
             .plus(bitflyerWithdrawRecords)

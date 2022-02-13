@@ -3,7 +3,6 @@ package bybit
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonPrimitive
-import model.Asset
 import model.Side
 import model.Symbol
 import model.TradeRecord
@@ -16,9 +15,10 @@ import java.time.ZonedDateTime
 data class InversePerpetualTradeHistoryResponse(
     @SerialName("result") val result: Result
 ) {
+
     @Serializable
     data class Result(
-        @SerialName("trade_list") val tradeList: List<Trade>
+        @SerialName("trade_list") val tradeList: List<Trade>?
     ) {
         @Serializable
         data class Trade(
@@ -30,18 +30,23 @@ data class InversePerpetualTradeHistoryResponse(
             @SerialName("exec_fee") val execFee: String
         )
     }
-    fun toTradeRecords(): List<TradeRecord> {
+
+    fun toTradeRecords(symbol: Symbol): List<TradeRecord> {
         return result.tradeList
-            .map { trade ->
+            ?.map { trade ->
                 TradeRecord(
-                    tradedAt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(trade.tradeTimeMs), ZoneId.systemDefault()),
-                    symbol = Symbol.from(Asset.pair(trade.symbol)),
+                    tradedAt = ZonedDateTime.ofInstant(
+                        Instant.ofEpochMilli(trade.tradeTimeMs),
+                        ZoneId.systemDefault()
+                    ),
+                    symbol = symbol,
                     side = Side.from(trade.side),
                     tradePrice = BigDecimal(trade.execPrice),
                     tradeAmount = BigDecimal(trade.execQty.content),
                     feeAmount = BigDecimal(trade.execFee),
-                    feeAsset = Asset.first(trade.symbol)
+                    feeAsset = symbol.first
                 )
-            }
+            } ?: emptyList()
     }
+
 }

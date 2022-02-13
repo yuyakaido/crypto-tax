@@ -11,5 +11,6 @@ data class TradeHistory(
     override val name: String,
     override val records: List<TradeRecord>
 ) : JsonFile<TradeRecord> {
-    override val json: JsonElement = RetrofitCreator.getJson().encodeToJsonElement(records)
+    override val json: JsonElement = RetrofitCreator.getJson()
+        .encodeToJsonElement(records.sortedByDescending { it.tradedAt })
 }

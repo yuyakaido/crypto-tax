@@ -2,12 +2,9 @@ package bybit
 
 import common.Service
 import json.JsonExporter
-import json.JsonImporter
 import json.TradeHistory
 import json.WithdrawHistory
 import kotlinx.serialization.ExperimentalSerializationApi
-import model.Asset
-import model.Symbol
 
 @ExperimentalSerializationApi
 object BybitService : Service {
@@ -18,6 +15,20 @@ object BybitService : Service {
 //            WithdrawHistory(
 //                name = "bybit_withdraw_history",
 //                records = withdrawRecords
+//            )
+//        )
+//        val exchangeTradeRecords = BybitDownloader.downloadExchangeTradeRecords()
+//        JsonExporter.export(
+//            TradeHistory(
+//                name = "bybit_exchange_trade_history",
+//                records = exchangeTradeRecords
+//            )
+//        )
+//        val spotTradeRecords = BybitDownloader.downloadSpotTradeRecords()
+//        JsonExporter.export(
+//            TradeHistory(
+//                name = "bybit_spot_trade_history",
+//                records = spotTradeRecords
 //            )
 //        )
 //        val inverseTradeRecords = BybitDownloader.downloadInversePerpetualTradeRecords()
@@ -32,23 +43,6 @@ object BybitService : Service {
 //            TradeHistory(
 //                name = "bybit_usdt_trade_history",
 //                records = usdtTradeRecords
-//            )
-//        )
-//        val spotSymbols = BybitDownloader.downloadSpotSymbols()
-//        val spotTradeRecords = BybitDownloader.downloadSpotTradeRecords(
-//            symbols = spotSymbols
-//        )
-//        JsonExporter.export(
-//            TradeHistory(
-//                name = "bybit_spot_trade_history",
-//                records = spotTradeRecords
-//            )
-//        )
-//        val exchangeRecords = BybitDownloader.downloadExchangeRecords()
-//        JsonExporter.export(
-//            TradeHistory(
-//                name = "bybit_exchange_history",
-//                records = exchangeRecords
 //            )
 //        )
     }

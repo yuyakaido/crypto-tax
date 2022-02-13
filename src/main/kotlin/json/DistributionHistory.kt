@@ -11,5 +11,6 @@ data class DistributionHistory(
     override val name: String,
     override val records: List<DistributionRecord>
 ) : JsonFile<DistributionRecord> {
-    override val json: JsonElement = RetrofitCreator.getJson().encodeToJsonElement(records)
+    override val json: JsonElement = RetrofitCreator.getJson()
+        .encodeToJsonElement(records.sortedByDescending { it.distributedAt })
 }

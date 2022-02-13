@@ -15,6 +15,7 @@ import java.time.ZonedDateTime
 data class SpotTradeHistoryResponse(
     @SerialName("result") val result: List<Result>
 ) {
+
     @Serializable
     data class Result(
         @SerialName("ticketId") val ticketId: String,
@@ -26,12 +27,16 @@ data class SpotTradeHistoryResponse(
         @SerialName("commission") val commission: String,
         @SerialName("commissionAsset") val commissionAsset: String
     )
-    fun toTradeRecords(): List<TradeRecord> {
+
+    fun toTradeRecords(symbol: Symbol): List<TradeRecord> {
         return result
             .map { result ->
                 TradeRecord(
-                    tradedAt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(result.time.toLong()), ZoneId.systemDefault()),
-                    symbol = Symbol.from(Asset.pair(result.symbol)),
+                    tradedAt = ZonedDateTime.ofInstant(
+                        Instant.ofEpochMilli(result.time.toLong()),
+                        ZoneId.systemDefault()
+                    ),
+                    symbol = symbol,
                     side = if (result.isBuyer) { Side.Buy } else { Side.Sell },
                     tradePrice = BigDecimal(result.price),
                     tradeAmount = BigDecimal(result.qty),
@@ -40,4 +45,5 @@ data class SpotTradeHistoryResponse(
                 )
             }
     }
+
 }
