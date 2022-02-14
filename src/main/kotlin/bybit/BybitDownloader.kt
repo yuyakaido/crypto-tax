@@ -3,10 +3,7 @@ package bybit
 import common.RetrofitCreator
 import kotlinx.coroutines.delay
 import kotlinx.serialization.ExperimentalSerializationApi
-import model.Asset
-import model.Symbol
-import model.TradeRecord
-import model.WithdrawRecord
+import model.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -116,6 +113,38 @@ object BybitDownloader {
         return records
     }
 
+    suspend fun downloadInversePerpetualProfitLossRecords(): List<ProfitLossRecord> {
+        println("Downloading bybit inverse perpetual profit loss history")
+
+        val records = mutableListOf<ProfitLossRecord>()
+        val symbols = listOf(
+            Symbol.from(Asset.pair("BTC/USD")),
+            Symbol.from(Asset.pair("ETH/USD")),
+            Symbol.from(Asset.pair("XRP/USD")),
+            Symbol.from(Asset.pair("EOS/USD")),
+            Symbol.from(Asset.pair("DOT/USD")),
+            Symbol.from(Asset.pair("BIT/USD"))
+        )
+        symbols.forEach { symbol ->
+            println(symbol)
+            var page = 1
+            while (true) {
+                val response = client.getInversePerpetualProfitLossHistory(
+                    symbol = symbol.toBybitString(),
+                    page = page++
+                )
+                records.addAll(response.toProfitLossRecords(symbol))
+                val size = response.result?.data?.size ?: 0
+                if (size < 50) {
+                    break
+                }
+                delay(5000)
+            }
+        }
+
+        return records
+    }
+
     suspend fun downloadUSDTPerpetualTradeRecords(): List<TradeRecord> {
         println("Downloading bybit USDT perpetual trade history")
 
@@ -133,6 +162,33 @@ object BybitDownloader {
                 )
                 records.addAll(response.toTradeRecords(symbol))
                 val size = response.result.data?.size?: 0
+                if (size < 50) {
+                    break
+                }
+                delay(5000)
+            }
+        }
+
+        return records
+    }
+
+    suspend fun downloadUSDTPerpetualProfitLossRecords(): List<ProfitLossRecord> {
+        println("Downloading bybit inverse perpetual profit loss history")
+
+        val records = mutableListOf<ProfitLossRecord>()
+        val symbols = listOf(
+            Symbol.from(Asset.pair("BIT/USDT")),
+        )
+        symbols.forEach { symbol ->
+            println(symbol)
+            var page = 1
+            while (true) {
+                val response = client.getUSDTPerpetualProfitLossHistory(
+                    symbol = symbol.toBybitString(),
+                    page = page++
+                )
+                records.addAll(response.toProfitLossRecords(symbol))
+                val size = response.result?.data?.size ?: 0
                 if (size < 50) {
                     break
                 }

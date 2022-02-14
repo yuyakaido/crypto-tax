@@ -2,6 +2,7 @@ package bybit
 
 import common.Service
 import json.JsonExporter
+import json.ProfitLossHistory
 import json.TradeHistory
 import json.WithdrawHistory
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -38,11 +39,25 @@ object BybitService : Service {
 //                records = inverseTradeRecords
 //            )
 //        )
+//        val inverseProfitLossRecords = BybitDownloader.downloadInversePerpetualProfitLossRecords()
+//        JsonExporter.export(
+//            ProfitLossHistory(
+//                name = "bybit_inverse_profit_loss_history",
+//                records = inverseProfitLossRecords
+//            )
+//        )
 //        val usdtTradeRecords = BybitDownloader.downloadUSDTPerpetualTradeRecords()
 //        JsonExporter.export(
 //            TradeHistory(
 //                name = "bybit_usdt_trade_history",
 //                records = usdtTradeRecords
+//            )
+//        )
+//        val usdtProfitLossRecords = BybitDownloader.downloadUSDTPerpetualProfitLossRecords()
+//        JsonExporter.export(
+//            ProfitLossHistory(
+//                name = "bybit_usdt_profit_loss_history",
+//                records = usdtProfitLossRecords
 //            )
 //        )
     }

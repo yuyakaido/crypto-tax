@@ -1,5 +1,6 @@
 package bybit
 
+import kotlinx.serialization.json.JsonElement
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -32,10 +33,24 @@ interface BybitHttpClient {
         @Query("page") page: Int
     ): InversePerpetualTradeHistoryResponse
 
+    @GET("v2/private/trade/closed-pnl/list")
+    suspend fun getInversePerpetualProfitLossHistory(
+        @Query("symbol") symbol: String,
+        @Query("page") page: Int,
+        @Query("limit") limit: Int = 50
+    ): PerpetualProfitLossHistoryResponse
+
     @GET("private/linear/trade/execution/list")
     suspend fun getUSDTPerpetualTradeHistory(
         @Query("symbol") symbol: String,
         @Query("page") page: Int
     ): USDTPerpetualTradeHistoryResponse
+
+    @GET("private/linear/trade/closed-pnl/list")
+    suspend fun getUSDTPerpetualProfitLossHistory(
+        @Query("symbol") symbol: String,
+        @Query("page") page: Int,
+        @Query("limit") limit: Int = 50
+    ): PerpetualProfitLossHistoryResponse
 
 }
