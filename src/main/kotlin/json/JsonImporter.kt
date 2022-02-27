@@ -53,4 +53,13 @@ object JsonImporter : IO {
         )
     }
 
+    fun importProfitLossRecords(name: String): List<ProfitLossRecord> {
+        return RetrofitCreator.getJson().decodeFromString(
+            string = import(
+                name = name,
+                from = IO.Directory.Outputs
+            )
+        )
+    }
+
 }

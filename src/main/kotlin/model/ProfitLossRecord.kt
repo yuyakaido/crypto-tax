@@ -10,4 +10,11 @@ data class ProfitLossRecord(
     @Contextual val tradedAt: ZonedDateTime,
     @Contextual val symbol: Symbol,
     @Contextual val closedPnl: BigDecimal
-)
+) : RecordType() {
+    override fun recordedAt(): ZonedDateTime {
+        return tradedAt
+    }
+    override fun asset(): Asset {
+        return symbol.first
+    }
+}

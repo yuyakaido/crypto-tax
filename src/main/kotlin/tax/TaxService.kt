@@ -22,7 +22,7 @@ object TaxService : Service {
     private var wallet = Wallet()
 
     override suspend fun execute() {
-//        (2017..2021).forEach { calculate(Year.of(it)) }
+        (2017..2021).forEach { calculate(Year.of(it)) }
     }
 
     private fun getNearestJpyPrice(asset: Asset, tradedAt: ZonedDateTime): BigDecimal {
@@ -79,7 +79,10 @@ object TaxService : Service {
         val bitbankTradeRecords = JsonImporter.importTradeRecords("bitbank_trade_history")
         val binanceSpotTradeRecords = JsonImporter.importTradeRecords("binance_spot_trade_history")
         val binanceDistributionRecords = JsonImporter.importDistributionRecords("binance_distribution_history")
+        val binanceProfitLossRecords = JsonImporter.importProfitLossRecords("binance_coin_future_profit_loss_history")
         val bybitExchangeTradeRecords = JsonImporter.importTradeRecords("bybit_exchange_trade_history")
+        val bybitInverseFutureProfitLossRecords = JsonImporter.importProfitLossRecords("bybit_inverse_profit_loss_history")
+        val bybitUsdtFutureProfitLossRecords = JsonImporter.importProfitLossRecords("bybit_usdt_profit_loss_history")
         val allRecords = bitflyerTradeRecords
             .plus(bitflyerDistributionRecords)
             .plus(bitflyerWithdrawRecords)
@@ -91,7 +94,10 @@ object TaxService : Service {
             .plus(bitbankTradeRecords)
             .plus(binanceSpotTradeRecords)
             .plus(binanceDistributionRecords)
+//            .plus(binanceProfitLossRecords)
             .plus(bybitExchangeTradeRecords)
+            .plus(bybitInverseFutureProfitLossRecords)
+            .plus(bybitUsdtFutureProfitLossRecords)
             .filter { it.recordedAt().year == year.value }
             .sortedBy { it.recordedAt() }
 
@@ -110,6 +116,9 @@ object TaxService : Service {
                         }
                         is WithdrawRecord -> {
                             it.asset
+                        }
+                        is ProfitLossRecord -> {
+                            it.symbol.first
                         }
                     }
                 },
@@ -161,6 +170,9 @@ object TaxService : Service {
                             BigDecimal.ZERO to it.amount
                         }
                         is WithdrawRecord -> {
+                            BigDecimal.ZERO to BigDecimal.ZERO
+                        }
+                        is ProfitLossRecord -> {
                             BigDecimal.ZERO to BigDecimal.ZERO
                         }
                     }
@@ -292,6 +304,13 @@ object TaxService : Service {
                             }
                         )
                         return@map it.asset to profitLoss
+                    }
+                    is ProfitLossRecord -> {
+                        val profitLoss = ProfitLoss(
+                            record = it,
+                            value = it.closedPnl
+                        )
+                        return@map it.asset() to profitLoss
                     }
                 }
             }
