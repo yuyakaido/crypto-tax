@@ -9,8 +9,5 @@ import java.time.ZonedDateTime
 data class ProfitLossRecord(
     @Contextual val tradedAt: ZonedDateTime,
     @Contextual val symbol: Symbol,
-    @Contextual val amount: BigDecimal,
-    @Contextual val entryPrice: BigDecimal,
-    @Contextual val exitPrice: BigDecimal,
     @Contextual val closedPnl: BigDecimal
 )

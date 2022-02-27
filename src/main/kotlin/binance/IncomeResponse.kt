@@ -3,7 +3,12 @@ package binance
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import model.ProfitLossRecord
+import model.Symbol
 import java.math.BigDecimal
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @Serializable
 data class IncomeResponse(
@@ -15,4 +20,18 @@ data class IncomeResponse(
     @SerialName("time") val time: Long,
     @SerialName("tranId") val tranId: Long,
     @SerialName("tradeId") val tradeId: String
-)
+) {
+    fun toProfitLossRecord(symbol: Symbol): ProfitLossRecord? {
+        return if (incomeType == "REALIZED_PNL") {
+            ProfitLossRecord(
+                tradedAt = ZonedDateTime.ofInstant(
+                    Instant.ofEpochMilli(time), ZoneId.systemDefault()
+                ),
+                symbol = symbol,
+                closedPnl = income
+            )
+        } else {
+            null
+        }
+    }
+}

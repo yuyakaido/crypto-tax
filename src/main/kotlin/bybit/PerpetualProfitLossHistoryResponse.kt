@@ -44,9 +44,6 @@ data class PerpetualProfitLossHistoryResponse(
                 return ProfitLossRecord(
                     tradedAt = ZonedDateTime.ofInstant(Instant.ofEpochSecond(createdAt), ZoneId.systemDefault()),
                     symbol = symbol,
-                    amount = qty,
-                    entryPrice = avgEntryPrice,
-                    exitPrice = avgExitPrice,
                     closedPnl = closedPnl
                 )
             }

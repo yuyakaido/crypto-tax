@@ -36,6 +36,13 @@ object BinanceService : Service {
 //                records = coinFutureTradeRecords
 //            )
 //        )
+//        val coinFutureProfitLossRecords = BinanceDownloader.downloadCoinFutureProfitLossHistory()
+//        JsonExporter.export(
+//            ProfitLossHistory(
+//                name = "binance_coin_future_profit_loss_history",
+//                records = coinFutureProfitLossRecords
+//            )
+//        )
 //        val distributionRecords = BinanceDownloader.downloadDistributionHistory()
 //        JsonExporter.export(
 //            DistributionHistory(

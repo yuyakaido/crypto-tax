@@ -98,22 +98,22 @@ object BinanceDownloader {
 
     suspend fun downloadCoinFutureTradeHistory(): List<TradeRecord> {
         val symbols = listOf(
-            "DOTUSD_PERP",
-            "EGLDUSD_PERP",
-            "LTCUSD_PERP",
-            "BCHUSD_PERP",
-            "DOGEUSD_PERP",
-            "ADAUSD_PERP"
+            Symbol.from(Asset.pair("DOT/USD")),
+            Symbol.from(Asset.pair("EGLD/USD")),
+            Symbol.from(Asset.pair("LTC/USD")),
+            Symbol.from(Asset.pair("BCH/USD")),
+            Symbol.from(Asset.pair("DOGE/USD")),
+            Symbol.from(Asset.pair("ADA/USD")),
         )
         val startTime = ZonedDateTime.of(
             LocalDateTime.of(2021, 1, 1, 0, 0, 0),
             ZoneOffset.UTC
         )
         val responses = mutableListOf<FutureTradeResponse>()
-        symbols.forEach {
+        symbols.forEach { symbol ->
             responses.addAll(
                 derivativeClient.getCoinFutureTradeHistory(
-                    symbol = it,
+                    symbol = "${symbol.toBinanceString()}_PERP",
                     startTime = startTime.toInstant().toEpochMilli()
                 )
             )
@@ -121,14 +121,29 @@ object BinanceDownloader {
         return responses.map { it.toTradeRecord() }
     }
 
-    suspend fun downloadCoinFutureIncomeHistory(): List<IncomeResponse> {
+    suspend fun downloadCoinFutureProfitLossHistory(): List<ProfitLossRecord> {
+        val symbols = listOf(
+            Symbol.from(Asset.pair("DOT/USD")),
+            Symbol.from(Asset.pair("EGLD/USD")),
+            Symbol.from(Asset.pair("LTC/USD")),
+            Symbol.from(Asset.pair("BCH/USD")),
+            Symbol.from(Asset.pair("DOGE/USD")),
+            Symbol.from(Asset.pair("ADA/USD")),
+        )
         val startTime = ZonedDateTime.of(
             LocalDateTime.of(2021, 1, 1, 0, 0, 0),
             ZoneOffset.UTC
         )
-        return derivativeClient.getCoinFutureIncomeHistory(
-            startTime = startTime.toInstant().toEpochMilli()
-        )
+        val records = mutableListOf<ProfitLossRecord>()
+        symbols.forEach { symbol ->
+            val response = derivativeClient.getCoinFutureProfitLossHistory(
+                symbol = "${symbol.toBinanceString()}_PERP",
+                startTime = startTime.toInstant().toEpochMilli()
+            )
+            records.addAll(response.mapNotNull { it.toProfitLossRecord(symbol) })
+        }
+
+        return records
     }
 
     suspend fun downloadDistributionHistory(): List<DistributionRecord> {
