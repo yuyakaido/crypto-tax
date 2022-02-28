@@ -81,6 +81,7 @@ object TaxService : Service {
         val binanceDistributionRecords = JsonImporter.importDistributionRecords("binance_distribution_history")
         val binanceProfitLossRecords = JsonImporter.importProfitLossRecords("binance_coin_future_profit_loss_history")
         val bybitExchangeTradeRecords = JsonImporter.importTradeRecords("bybit_exchange_trade_history")
+        val bybitSpotTradeRecords = JsonImporter.importTradeRecords("bybit_spot_trade_history")
         val bybitInverseFutureProfitLossRecords = JsonImporter.importProfitLossRecords("bybit_inverse_profit_loss_history")
         val bybitUsdtFutureProfitLossRecords = JsonImporter.importProfitLossRecords("bybit_usdt_profit_loss_history")
         val allRecords = bitflyerTradeRecords
@@ -96,6 +97,7 @@ object TaxService : Service {
             .plus(binanceDistributionRecords)
 //            .plus(binanceProfitLossRecords)
             .plus(bybitExchangeTradeRecords)
+            .plus(bybitSpotTradeRecords)
             .plus(bybitInverseFutureProfitLossRecords)
             .plus(bybitUsdtFutureProfitLossRecords)
             .filter { it.recordedAt().year == year.value }
@@ -265,7 +267,10 @@ object TaxService : Service {
                                     }
                                     Asset.USDT, Asset.BUSD, Asset.USDC -> {
                                         val baseAsset = it.symbol.first
-                                        val holding = wallet.holdings.getValue(it.symbol.first)
+                                        val holding = wallet.holdings.getOrDefault(
+                                            key = it.symbol.first,
+                                            defaultValue = Holding(it.tradeAmount, BigDecimal.ZERO)
+                                        )
                                         wallet = wallet.minus(baseAsset, it.tradeAmount)
                                         wallet = wallet.minus(it.feeAsset, it.feeAmount)
                                         val unitProfit = it.tradePrice.multiply(getNearestUsdJpyPrice(it.tradedAt)) - holding.averagePrice
