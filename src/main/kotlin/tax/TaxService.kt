@@ -145,22 +145,14 @@ object TaxService : Service {
                                     }
                                 }
                                 Side.Sell -> {
-                                    when (it.symbol.second) {
-                                        Asset.BTC -> {
-                                            val btcAmount = it.tradePrice.multiply(it.tradeAmount)
-                                            val jpyAmount = btcAmount.multiply(getNearestBtcJpyPrice(it.tradedAt))
-                                            val jpyPrice = jpyAmount.div(btcAmount)
-                                            jpyPrice to btcAmount
-                                        }
-                                        Asset.USDT, Asset.BUSD, Asset.USDC -> {
-                                            val baseAmount = it.tradePrice.multiply(it.tradeAmount)
-                                            val jpyAmount = baseAmount.multiply(getNearestUsdJpyPrice(it.tradedAt))
-                                            val jpyPrice = jpyAmount.div(baseAmount)
-                                            jpyPrice to baseAmount
-                                        }
-                                        else -> {
-                                            BigDecimal.ZERO to BigDecimal.ZERO
-                                        }
+                                    val quoteAsset = it.symbol.second
+                                    if (quoteAsset != Asset.JPY) {
+                                        val baseAmount = it.tradePrice.multiply(it.tradeAmount)
+                                        val nearestJpyPrice = getNearestJpyPrice(quoteAsset, it.tradedAt)
+                                        nearestJpyPrice to baseAmount
+                                    } else {
+                                        // 円転は取得原価の計算に影響を与えない
+                                        BigDecimal.ZERO to BigDecimal.ZERO
                                     }
                                 }
                             }
