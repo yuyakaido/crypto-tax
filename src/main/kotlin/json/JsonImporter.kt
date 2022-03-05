@@ -35,6 +35,15 @@ object JsonImporter : IO {
         )
     }
 
+    fun importExchangeRecords(name: String): List<ExchangeRecord> {
+        return RetrofitCreator.getJson().decodeFromString(
+            string = import(
+                name = name,
+                from = IO.Directory.Outputs
+            )
+        )
+    }
+
     fun importDistributionRecords(name: String): List<DistributionRecord> {
         return RetrofitCreator.getJson().decodeFromString(
             string = import(

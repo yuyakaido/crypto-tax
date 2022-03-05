@@ -47,6 +47,13 @@ object JsonExporter : IO {
         )
     }
 
+    fun export(file: ExchangeHistory) {
+        export(
+            file = file,
+            into = IO.Directory.Outputs
+        )
+    }
+
     fun export(file: ProfitLossHistory) {
         export(
             file = file,

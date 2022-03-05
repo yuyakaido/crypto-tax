@@ -32,6 +32,7 @@ object TaxService : Service {
             Asset.XRP -> getNearestXrpJpyPrice(tradedAt)
             Asset.EOS -> getNearestEosJpyPrice(tradedAt)
             Asset.DOT -> getNearestDotJpyPrice(tradedAt)
+            Asset.USDT -> getNearestUsdJpyPrice(tradedAt)
             else -> throw RuntimeException("Unknown asset: $asset")
         }
     }
@@ -80,7 +81,7 @@ object TaxService : Service {
         val binanceSpotTradeRecords = JsonImporter.importTradeRecords("binance_spot_trade_history")
         val binanceDistributionRecords = JsonImporter.importDistributionRecords("binance_distribution_history")
         val binanceProfitLossRecords = JsonImporter.importProfitLossRecords("binance_coin_future_profit_loss_history")
-        val bybitExchangeTradeRecords = JsonImporter.importTradeRecords("bybit_exchange_trade_history")
+        val bybitExchangeRecords = JsonImporter.importExchangeRecords("bybit_exchange_history")
         val bybitSpotTradeRecords = JsonImporter.importTradeRecords("bybit_spot_trade_history")
         val bybitInverseFutureProfitLossRecords = JsonImporter.importProfitLossRecords("bybit_inverse_profit_loss_history")
         val bybitUsdtFutureProfitLossRecords = JsonImporter.importProfitLossRecords("bybit_usdt_profit_loss_history")
@@ -96,7 +97,7 @@ object TaxService : Service {
             .plus(binanceSpotTradeRecords)
             .plus(binanceDistributionRecords)
 //            .plus(binanceProfitLossRecords)
-            .plus(bybitExchangeTradeRecords)
+            .plus(bybitExchangeRecords)
             .plus(bybitSpotTradeRecords)
             .plus(bybitInverseFutureProfitLossRecords)
             .plus(bybitUsdtFutureProfitLossRecords)
@@ -112,6 +113,9 @@ object TaxService : Service {
                                 Side.Buy -> it.symbol.first
                                 Side.Sell -> it.symbol.second
                             }
+                        }
+                        is ExchangeRecord -> {
+                            it.asset()
                         }
                         is DistributionRecord -> {
                             it.asset
@@ -167,6 +171,11 @@ object TaxService : Service {
                                     }
                                 }
                             }
+                        }
+                        is ExchangeRecord -> {
+                            val nearestJpyPrice = getNearestJpyPrice(it.symbol.second, it.exchangedAt)
+                            val jpyPrice = it.fromAmount.multiply(nearestJpyPrice)
+                            jpyPrice to it.toAmount
                         }
                         is DistributionRecord -> {
                             BigDecimal.ZERO to it.amount
@@ -283,6 +292,14 @@ object TaxService : Service {
                                 }
                             }
                         }
+                    }
+                    is ExchangeRecord -> {
+                        wallet = wallet.minus(it.symbol.second, it.fromAmount)
+                        wallet = wallet.minus(it.feeAsset, it.feeAmount)
+                        return@map it.symbol.second to ProfitLoss(
+                            record = it,
+                            value = BigDecimal.ZERO
+                        )
                     }
                     is DistributionRecord -> {
                         val profitLoss = ProfitLoss(

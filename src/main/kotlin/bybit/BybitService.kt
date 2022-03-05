@@ -1,10 +1,7 @@
 package bybit
 
 import common.Service
-import json.JsonExporter
-import json.ProfitLossHistory
-import json.TradeHistory
-import json.WithdrawHistory
+import json.*
 import kotlinx.serialization.ExperimentalSerializationApi
 
 @ExperimentalSerializationApi
@@ -18,11 +15,11 @@ object BybitService : Service {
 //                records = withdrawRecords
 //            )
 //        )
-//        val exchangeTradeRecords = BybitDownloader.downloadExchangeTradeRecords()
+//        val exchangeRecords = BybitDownloader.downloadExchangeRecords()
 //        JsonExporter.export(
-//            TradeHistory(
-//                name = "bybit_exchange_trade_history",
-//                records = exchangeTradeRecords
+//            ExchangeHistory(
+//                name = "bybit_exchange_history",
+//                records = exchangeRecords
 //            )
 //        )
 //        val spotTradeRecords = BybitDownloader.downloadSpotTradeRecords()

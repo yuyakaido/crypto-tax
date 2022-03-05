@@ -28,7 +28,7 @@ object BybitDownloader {
         return client.getWithdrawHistory().toWithdrawRecords()
     }
 
-    suspend fun downloadExchangeTradeRecords(): List<TradeRecord> {
+    suspend fun downloadExchangeRecords(): List<ExchangeRecord> {
         println("Downloading bybit exchange trade history")
 
         val responses = mutableListOf<ExchangeTradeHistoryResponse>()
@@ -45,8 +45,8 @@ object BybitDownloader {
         }
 
         return responses
-            .flatMap { it.toTradeRecords() }
-            .distinctBy { it.tradedAt }
+            .flatMap { it.toExchangeRecords() }
+            .distinctBy { it.exchangedAt }
     }
 
     suspend fun downloadSpotTradeRecords(): List<TradeRecord> {
