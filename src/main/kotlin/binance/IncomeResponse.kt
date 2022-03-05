@@ -22,16 +22,12 @@ data class IncomeResponse(
     @SerialName("tradeId") val tradeId: String
 ) {
     fun toProfitLossRecord(symbol: Symbol): ProfitLossRecord? {
-        return if (incomeType == "REALIZED_PNL") {
-            ProfitLossRecord(
-                tradedAt = ZonedDateTime.ofInstant(
-                    Instant.ofEpochMilli(time), ZoneId.systemDefault()
-                ),
-                symbol = symbol,
-                closedPnl = income
-            )
-        } else {
-            null
-        }
+        return ProfitLossRecord(
+            tradedAt = ZonedDateTime.ofInstant(
+                Instant.ofEpochMilli(time), ZoneId.systemDefault()
+            ),
+            symbol = symbol,
+            value = income
+        )
     }
 }

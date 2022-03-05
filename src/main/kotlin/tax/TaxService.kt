@@ -313,7 +313,7 @@ object TaxService : Service {
                     is ProfitLossRecord -> {
                         val profitLoss = ProfitLoss(
                             record = it,
-                            value = it.closedPnl
+                            value = it.value
                         )
                         return@map it.asset() to profitLoss
                     }

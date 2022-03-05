@@ -125,6 +125,8 @@ object BinanceDownloader {
     }
 
     suspend fun downloadCoinFutureProfitLossHistory(): List<ProfitLossRecord> {
+        println("Downloading binance coin future profit loss history")
+
         val symbols = listOf(
             Symbol.from(Asset.pair("DOT/USD")),
             Symbol.from(Asset.pair("EGLD/USD")),
@@ -139,11 +141,13 @@ object BinanceDownloader {
         )
         val records = mutableListOf<ProfitLossRecord>()
         symbols.forEach { symbol ->
-            val response = derivativeClient.getCoinFutureProfitLossHistory(
+            val responses = derivativeClient.getCoinFutureProfitLossHistory(
                 symbol = "${symbol.toBinanceString()}_PERP",
                 startTime = startTime.toInstant().toEpochMilli()
             )
-            records.addAll(response.mapNotNull { it.toProfitLossRecord(symbol) })
+            println("Downloaded profit loss history of $symbol: ${responses.size}")
+            records.addAll(responses.mapNotNull { it.toProfitLossRecord(symbol) })
+            delay(5000)
         }
 
         return records

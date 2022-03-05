@@ -9,7 +9,7 @@ import java.time.ZonedDateTime
 data class ProfitLossRecord(
     @Contextual val tradedAt: ZonedDateTime,
     @Contextual val symbol: Symbol,
-    @Contextual val closedPnl: BigDecimal
+    @Contextual val value: BigDecimal
 ) : RecordType() {
     override fun recordedAt(): ZonedDateTime {
         return tradedAt
