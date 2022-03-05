@@ -145,14 +145,16 @@ object TaxService : Service {
                                     }
                                 }
                                 Side.Sell -> {
-                                    val quoteAsset = it.symbol.second
-                                    if (quoteAsset != Asset.JPY) {
-                                        val baseAmount = it.tradePrice.multiply(it.tradeAmount)
-                                        val nearestJpyPrice = getNearestJpyPrice(quoteAsset, it.tradedAt)
-                                        nearestJpyPrice to baseAmount
-                                    } else {
-                                        // 円転は取得原価の計算に影響を与えない
-                                        BigDecimal.ZERO to BigDecimal.ZERO
+                                    when (val quoteAsset = it.symbol.second) {
+                                        Asset.JPY -> {
+                                            // 円転は取得原価の計算に影響を与えない
+                                            BigDecimal.ZERO to BigDecimal.ZERO
+                                        }
+                                        else -> {
+                                            val baseAmount = it.tradePrice.multiply(it.tradeAmount)
+                                            val nearestJpyPrice = getNearestJpyPrice(quoteAsset, it.tradedAt)
+                                            nearestJpyPrice to baseAmount
+                                        }
                                     }
                                 }
                             }
@@ -212,26 +214,28 @@ object TaxService : Service {
                     is TradeRecord -> {
                         when (it.side) {
                             Side.Buy -> {
-                                val quoteAsset = it.symbol.second
-                                if (quoteAsset == Asset.JPY) {
-                                    // 日本円で暗号資産を購入した場合に損益は発生しない
-                                    val profitLoss = ProfitLoss(
-                                        record = it,
-                                        value = BigDecimal.ZERO
-                                    )
-                                    return@map it.symbol.first to profitLoss
-                                } else {
-                                    // 暗号資産で暗号資産を購入した場合はQuoteAssetを利確した扱いとなる
-                                    val quoteAmount = it.tradePrice.multiply(it.tradeAmount)
-                                    wallet = wallet.minus(quoteAsset, quoteAmount)
-                                    wallet = wallet.minus(it.feeAsset, it.feeAmount)
-                                    val holding = wallet.holdings.getValue(quoteAsset)
-                                    val nearestJpyPrice = getNearestJpyPrice(quoteAsset, it.tradedAt)
-                                    val profitLoss = ProfitLoss(
-                                        record = it,
-                                        value = quoteAmount.multiply(nearestJpyPrice) - quoteAmount.multiply(holding.averagePrice)
-                                    )
-                                    return@map it.symbol.second to profitLoss
+                                when (val quoteAsset = it.symbol.second) {
+                                    Asset.JPY -> {
+                                        // 日本円で暗号資産を購入した場合に損益は発生しない
+                                        val profitLoss = ProfitLoss(
+                                            record = it,
+                                            value = BigDecimal.ZERO
+                                        )
+                                        return@map it.symbol.first to profitLoss
+                                    }
+                                    else -> {
+                                        // 暗号資産で暗号資産を購入した場合はQuoteAssetを利確した扱いとなる
+                                        val quoteAmount = it.tradePrice.multiply(it.tradeAmount)
+                                        wallet = wallet.minus(quoteAsset, quoteAmount)
+                                        wallet = wallet.minus(it.feeAsset, it.feeAmount)
+                                        val holding = wallet.holdings.getValue(quoteAsset)
+                                        val nearestJpyPrice = getNearestJpyPrice(quoteAsset, it.tradedAt)
+                                        val profitLoss = ProfitLoss(
+                                            record = it,
+                                            value = quoteAmount.multiply(nearestJpyPrice) - quoteAmount.multiply(holding.averagePrice)
+                                        )
+                                        return@map it.symbol.second to profitLoss
+                                    }
                                 }
                             }
                             Side.Sell -> {
