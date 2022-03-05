@@ -32,12 +32,12 @@ data class FutureTradeResponse(
     @SerialName("buyer") val buyer: Boolean,
     @SerialName("maker") val maker: Boolean
 ) {
-    fun toTradeRecord(): TradeRecord {
+    fun toTradeRecord(symbol: Symbol): TradeRecord {
         return TradeRecord(
             tradedAt = ZonedDateTime
                 .ofInstant(Instant.ofEpochMilli(time), ZoneOffset.UTC)
                 .withZoneSameInstant(ZoneId.systemDefault()),
-            symbol = Symbol.from(Asset.pair(pair)),
+            symbol = symbol,
             side = Side.from(side),
             tradePrice = price,
             tradeAmount = baseQty,

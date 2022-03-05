@@ -22,7 +22,7 @@ object TaxService : Service {
     private var wallet = Wallet()
 
     override suspend fun execute() {
-        (2017..2021).forEach { calculate(Year.of(it)) }
+//        (2017..2021).forEach { calculate(Year.of(it)) }
     }
 
     private fun getNearestJpyPrice(asset: Asset, tradedAt: ZonedDateTime): BigDecimal {
