@@ -272,12 +272,17 @@ object TaxService : Service {
                         }
                     }
                     is ExchangeRecord -> {
-                        wallet = wallet.minus(it.symbol.second, it.fromAmount)
+                        // 暗号資産同士を交換した場合、QuoteAssetを利確した扱いとなる
+                        val quoteAsset = it.symbol.second
+                        wallet = wallet.minus(quoteAsset, it.fromAmount)
                         wallet = wallet.minus(it.feeAsset, it.feeAmount)
-                        return@map it.symbol.second to ProfitLoss(
+                        val holding = wallet.holdings.getValue(quoteAsset)
+                        val nearestJpyPrice = getNearestJpyPrice(quoteAsset, it.exchangedAt)
+                        val profitLoss = ProfitLoss(
                             record = it,
-                            value = BigDecimal.ZERO
+                            value = it.fromAmount.multiply(nearestJpyPrice) - it.fromAmount.multiply(holding.averagePrice)
                         )
+                        return@map quoteAsset to profitLoss
                     }
                     is DistributionRecord -> {
                         val profitLoss = ProfitLoss(
