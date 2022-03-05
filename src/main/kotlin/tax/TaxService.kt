@@ -32,7 +32,7 @@ object TaxService : Service {
             Asset.XRP -> getNearestXrpJpyPrice(tradedAt)
             Asset.EOS -> getNearestEosJpyPrice(tradedAt)
             Asset.DOT -> getNearestDotJpyPrice(tradedAt)
-            Asset.USDT -> getNearestUsdJpyPrice(tradedAt)
+            Asset.USDT, Asset.BUSD, Asset.USDC -> getNearestUsdJpyPrice(tradedAt)
             else -> throw RuntimeException("Unknown asset: $asset")
         }
     }
@@ -137,17 +137,10 @@ object TaxService : Service {
                                         Asset.JPY -> {
                                             it.tradePrice to it.tradeAmount
                                         }
-                                        Asset.BTC, Asset.ETH, Asset.XRP, Asset.EOS, Asset.DOT -> {
+                                        else -> {
                                             val nearestJpyPrice = getNearestJpyPrice(quoteAsset, it.tradedAt)
                                             val jpyPrice = it.tradePrice.multiply(nearestJpyPrice)
                                             jpyPrice to it.tradeAmount
-                                        }
-                                        Asset.USDT, Asset.BUSD, Asset.USDC -> {
-                                            val jpyPrice = it.tradePrice.multiply(getNearestUsdJpyPrice(it.tradedAt))
-                                            jpyPrice to it.tradeAmount
-                                        }
-                                        else -> {
-                                            throw RuntimeException("Unknown symbol: ${it.symbol}")
                                         }
                                     }
                                 }
