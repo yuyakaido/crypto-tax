@@ -96,7 +96,7 @@ object TaxService : Service {
             .plus(bitbankTradeRecords)
             .plus(binanceSpotTradeRecords)
             .plus(binanceDistributionRecords)
-//            .plus(binanceProfitLossRecords)
+            .plus(binanceProfitLossRecords)
             .plus(bybitExchangeRecords)
             .plus(bybitSpotTradeRecords)
             .plus(bybitInverseFutureProfitLossRecords)
@@ -178,12 +178,15 @@ object TaxService : Service {
                             jpyPrice to it.toAmount
                         }
                         is DistributionRecord -> {
+                            // Airdropの取得原価は0円とする
                             BigDecimal.ZERO to it.amount
                         }
                         is WithdrawRecord -> {
+                            // 引き出し履歴は取得原価の計算には影響を与えない
                             BigDecimal.ZERO to BigDecimal.ZERO
                         }
                         is ProfitLossRecord -> {
+                            // 先物取引履歴は取得原価の計算には影響を与えない
                             BigDecimal.ZERO to BigDecimal.ZERO
                         }
                     }
@@ -239,6 +242,8 @@ object TaxService : Service {
                                         return@map it.symbol.second to profitLoss
                                     }
                                     else -> {
+                                        val quoteAmount = it.tradePrice.multiply(it.tradeAmount)
+                                        wallet = wallet.minus(asset, quoteAmount)
                                         wallet = wallet.minus(it.feeAsset, it.feeAmount)
                                         val profitLoss = ProfitLoss(
                                             record = it,
