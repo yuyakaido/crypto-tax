@@ -247,9 +247,12 @@ object TaxService : Service {
                                         )
                                         return@map it.symbol.first to profitLoss
                                     }
-                                    Asset.BTC, Asset.ETH, Asset.XRP, Asset.EOS, Asset.DOT -> {
+                                    else -> {
                                         val baseAsset = it.symbol.first
-                                        val holding = wallet.holdings.getValue(it.symbol.first)
+                                        val holding = wallet.holdings.getOrDefault(
+                                            key = it.symbol.first,
+                                            defaultValue = Holding(it.tradeAmount, BigDecimal.ZERO)
+                                        )
                                         wallet = wallet.minus(baseAsset, it.tradeAmount)
                                         wallet = wallet.minus(it.feeAsset, it.feeAmount)
                                         val nearestJpyPrice = getNearestJpyPrice(quoteAsset, it.tradedAt)
@@ -260,21 +263,6 @@ object TaxService : Service {
                                         )
                                         return@map it.symbol.first to profitLoss
                                     }
-                                    Asset.USDT, Asset.BUSD, Asset.USDC -> {
-                                        val baseAsset = it.symbol.first
-                                        val holding = wallet.holdings.getOrDefault(
-                                            key = it.symbol.first,
-                                            defaultValue = Holding(it.tradeAmount, BigDecimal.ZERO)
-                                        )
-                                        wallet = wallet.minus(baseAsset, it.tradeAmount)
-                                        wallet = wallet.minus(it.feeAsset, it.feeAmount)
-                                        val unitProfit = it.tradePrice.multiply(getNearestUsdJpyPrice(it.tradedAt)) - holding.averagePrice
-                                        return@map it.symbol.first to ProfitLoss(
-                                            record = it,
-                                            value = unitProfit.multiply(it.tradeAmount)
-                                        )
-                                    }
-                                    else -> throw RuntimeException("Unknown symbol: ${it.symbol}")
                                 }
                             }
                         }
