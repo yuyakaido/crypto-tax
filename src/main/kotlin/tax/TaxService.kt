@@ -158,9 +158,8 @@ object TaxService : Service {
                             }
                         }
                         is ExchangeRecord -> {
-                            val nearestJpyPrice = getNearestJpyPrice(it.symbol.second, it.exchangedAt)
-                            val jpyPrice = it.fromAmount.multiply(nearestJpyPrice)
-                            jpyPrice to it.toAmount
+                            val nearestJpyPrice = getNearestJpyPrice(it.symbol.first, it.exchangedAt)
+                            nearestJpyPrice to it.toAmount
                         }
                         is DistributionRecord -> {
                             // Airdropの取得原価は0円とする
