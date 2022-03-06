@@ -100,7 +100,7 @@ object BybitDownloader {
                     symbol = symbol.toBybitString(),
                     page = page++
                 )
-                records.addAll(response.toFutureTradeRecords(symbol))
+                records.addAll(response.toTradeRecords(symbol))
                 val size = response.result.tradeList?.size ?: 0
                 if (size < 50) {
                     break
@@ -161,7 +161,7 @@ object BybitDownloader {
                     symbol = symbol.toBybitString(),
                     page = page++
                 )
-                records.addAll(response.toFutureTradeRecords(symbol))
+                records.addAll(response.toTradeRecords(symbol))
                 val size = response.result.data?.size?: 0
                 if (size < 50) {
                     break

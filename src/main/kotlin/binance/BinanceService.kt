@@ -65,7 +65,7 @@ object BinanceService : Service {
 //        )
 //        val coinFutureTradeRecords = BinanceDownloader.downloadCoinFutureTradeHistory()
 //        JsonExporter.export(
-//            TradeHistory(
+//            FutureTradeHistory(
 //                name = "binance_coin_future_trade_history",
 //                records = coinFutureTradeRecords
 //            )

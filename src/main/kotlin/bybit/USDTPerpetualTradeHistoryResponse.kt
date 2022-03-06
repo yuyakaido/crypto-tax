@@ -45,7 +45,7 @@ data class USDTPerpetualTradeHistoryResponse(
         )
     }
 
-    fun toFutureTradeRecords(symbol: Symbol): List<FutureTradeRecord> {
+    fun toTradeRecords(symbol: Symbol): List<FutureTradeRecord> {
         return result.data
             ?.map { trade ->
                 FutureTradeRecord(

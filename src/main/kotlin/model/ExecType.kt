@@ -9,12 +9,16 @@ enum class ExecType(
         bybit = "Trade"
     ),
     Commission(
-        binance = "",
+        binance = "COMMISSION",
         bybit = ""
     ),
     Funding(
-        binance = "",
+        binance = "FUNDING_FEE",
         bybit = "Funding"
+    ),
+    RealizedPnl(
+        binance = "REALIZED_PNL",
+        bybit = ""
     );
     companion object {
         fun binance(value: String): ExecType {

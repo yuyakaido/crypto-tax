@@ -47,7 +47,7 @@ data class InversePerpetualTradeHistoryResponse(
         )
     }
 
-    fun toFutureTradeRecords(symbol: Symbol): List<FutureTradeRecord> {
+    fun toTradeRecords(symbol: Symbol): List<FutureTradeRecord> {
         return result.tradeList
             ?.map { trade ->
                 FutureTradeRecord(

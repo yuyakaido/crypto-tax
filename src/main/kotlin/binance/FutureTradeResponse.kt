@@ -3,10 +3,7 @@ package binance
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import model.Asset
-import model.Side
-import model.Symbol
-import model.SpotTradeRecord
+import model.*
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.ZoneId
@@ -32,13 +29,13 @@ data class FutureTradeResponse(
     @SerialName("buyer") val buyer: Boolean,
     @SerialName("maker") val maker: Boolean
 ) {
-    fun toTradeRecord(symbol: Symbol): SpotTradeRecord {
-        return SpotTradeRecord(
+    fun toTradeRecord(symbol: Symbol): FutureTradeRecord {
+        return FutureTradeRecord(
             tradedAt = ZonedDateTime
                 .ofInstant(Instant.ofEpochMilli(time), ZoneOffset.UTC)
                 .withZoneSameInstant(ZoneId.systemDefault()),
             symbol = symbol,
-            side = Side.from(side),
+            type = ExecType.Trade,
             tradePrice = price,
             tradeAmount = baseQty,
             feeAmount = commission,

@@ -22,7 +22,7 @@ object TaxService : Service {
     private var wallet = Wallet()
 
     override suspend fun execute() {
-//        (2017..2021).forEach { calculate(Year.of(it)) }
+        (2017..2021).forEach { calculate(Year.of(it)) }
     }
 
     private fun getNearestJpyPrice(asset: Asset, tradedAt: ZonedDateTime): BigDecimal {
@@ -78,7 +78,8 @@ object TaxService : Service {
         val bitbankTradeRecords = JsonImporter.importSpotTradeRecords("bitbank_trade_history")
         val binanceSpotTradeRecords = JsonImporter.importSpotTradeRecords("binance_spot_trade_history")
         val binanceDistributionRecords = JsonImporter.importDistributionRecords("binance_distribution_history")
-//        val binanceProfitLossRecords = JsonImporter.importProfitLossRecords("binance_coin_future_profit_loss_history")
+        val binanceFutureTradeRecords = JsonImporter.importFutureTradeRecords("binance_coin_future_trade_history")
+        val binanceFutureProfitLossRecords = JsonImporter.importProfitLossRecords("binance_coin_future_profit_loss_history")
         val bybitExchangeRecords = JsonImporter.importExchangeRecords("bybit_exchange_history")
         val bybitSpotTradeRecords = JsonImporter.importSpotTradeRecords("bybit_spot_trade_history")
         val bybitInverseTradeRecords = JsonImporter.importFutureTradeRecords("bybit_inverse_trade_history")
@@ -94,7 +95,8 @@ object TaxService : Service {
             .plus(bitbankTradeRecords)
             .plus(binanceSpotTradeRecords)
             .plus(binanceDistributionRecords)
-//            .plus(binanceProfitLossRecords)
+//            .plus(binanceFutureTradeRecords)
+//            .plus(binanceFutureProfitLossRecords)
             .plus(bybitExchangeRecords)
             .plus(bybitSpotTradeRecords)
             .plus(bybitInverseTradeRecords)
