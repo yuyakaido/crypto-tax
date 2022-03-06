@@ -3,7 +3,11 @@ package binance
 import common.RetrofitCreator
 import kotlinx.coroutines.delay
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import model.*
+import java.math.BigDecimal
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -35,6 +39,53 @@ object BinanceDownloader {
             )
         )
         .create(BinanceDerivativeHttpClient::class.java)
+
+    suspend fun downloadChartRecords(
+        symbol: Symbol,
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): List<ChartRecord> {
+        var start = from
+        var end = start.plusDays(1).minusSeconds(1)
+
+        val records = mutableListOf<ChartRecord>()
+
+        while (true) {
+            println("Symbol: $symbol, Start: $start, End: $end")
+
+            val startEpochMillis = start.toInstant(ZoneOffset.UTC).toEpochMilli()
+            val endEpochMillis = end.toInstant(ZoneOffset.UTC).toEpochMilli()
+
+            val responses = spotClient.getChartHistory(
+                symbol = symbol.toBinanceString(),
+                startTime = startEpochMillis,
+                endTime = endEpochMillis
+            )
+
+            records.addAll(
+                responses.map {
+                    ChartRecord(
+                        date = ZonedDateTime.ofInstant(
+                            Instant.ofEpochMilli(it[0].jsonPrimitive.long),
+                            ZoneOffset.UTC
+                        ),
+                        price = BigDecimal(it[4].jsonPrimitive.content)
+                    )
+                }
+            )
+
+            start = start.plusDays(1)
+            end = end.plusDays(1)
+
+            if (end <= to) {
+                delay(5000)
+            } else {
+                break
+            }
+        }
+
+        return records
+    }
 
     suspend fun downloadDepositHistory(): List<DepositRecord> {
         return spotClient.getDepositHistory().map { it.toDepositRecord() }

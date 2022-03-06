@@ -12,7 +12,8 @@ class BinanceHttpInterceptor(
 
     companion object {
         private val PUBLIC_API_PATH_LIST = listOf(
-            "/api/v3/exchangeInfo"
+            "/api/v3/exchangeInfo",
+            "/api/v3/klines"
         )
     }
 

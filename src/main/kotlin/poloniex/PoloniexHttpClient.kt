@@ -1,20 +1,13 @@
 package poloniex
 
 import kotlinx.serialization.json.JsonObject
-import retrofit2.http.*
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
+import retrofit2.http.POST
 import java.time.Instant
 import java.time.ZonedDateTime
 
 interface PoloniexHttpClient {
-
-    @GET("public")
-    suspend fun getChartData(
-        @Query("command") command: String = "returnChartData",
-        @Query("currencyPair") currencyPair: String = "USDT_BTC",
-        @Query("period") period: Long = 300,
-        @Query("start") start: Long,
-        @Query("end") end: Long
-    ): List<ChartDataResponse>
 
     @FormUrlEncoded
     @POST("tradingApi")

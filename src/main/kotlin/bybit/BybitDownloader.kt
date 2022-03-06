@@ -90,8 +90,7 @@ object BybitDownloader {
             Symbol.from(Asset.pair("ETH/USD")),
             Symbol.from(Asset.pair("XRP/USD")),
             Symbol.from(Asset.pair("EOS/USD")),
-            Symbol.from(Asset.pair("DOT/USD")),
-            Symbol.from(Asset.pair("BIT/USD"))
+            Symbol.from(Asset.pair("DOT/USD"))
         )
         symbols.forEach { symbol ->
             println(symbol)
@@ -122,8 +121,7 @@ object BybitDownloader {
             Symbol.from(Asset.pair("ETH/USD")),
             Symbol.from(Asset.pair("XRP/USD")),
             Symbol.from(Asset.pair("EOS/USD")),
-            Symbol.from(Asset.pair("DOT/USD")),
-            Symbol.from(Asset.pair("BIT/USD"))
+            Symbol.from(Asset.pair("DOT/USD"))
         )
         symbols.forEach { symbol ->
             println(symbol)

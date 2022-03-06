@@ -3,11 +3,45 @@ package binance
 import common.Service
 import json.*
 import kotlinx.serialization.ExperimentalSerializationApi
+import model.Asset
+import model.Symbol
+import java.time.LocalDateTime
 
 @ExperimentalSerializationApi
 object BinanceService : Service {
 
     override suspend fun execute() {
+//        (2017..2020).forEach { year ->
+//            val symbol = Symbol.from(Asset.pair("BTC/USDT"))
+//            val from = LocalDateTime.of(year, 1, 1, 0, 0 ,0)
+//            val to = LocalDateTime.of(year, 12, 31, 23, 59, 59)
+//            val chartRecords = BinanceDownloader.downloadChartRecords(symbol = symbol, from = from, to = to)
+//            JsonExporter.export(
+//                ChartHistory(
+//                    name = "binance_btc_usdt_chart_history_$year",
+//                    records = chartRecords
+//                )
+//            )
+//        }
+//        val symbols = listOf(
+//            Symbol.from(Asset.pair("ETH/USDT")),
+//            Symbol.from(Asset.pair("XRP/USDT")),
+//            Symbol.from(Asset.pair("EOS/USDT")),
+//            Symbol.from(Asset.pair("DOT/USDT")),
+//        )
+//        symbols.forEach { symbol ->
+//            (2021..2021).forEach { year ->
+//                val from = LocalDateTime.of(year, 1, 1, 0, 0 ,0)
+//                val to = LocalDateTime.of(year, 12, 31, 23, 59, 59)
+//                val chartRecords = BinanceDownloader.downloadChartRecords(symbol = symbol, from = from, to = to)
+//                JsonExporter.export(
+//                    ChartHistory(
+//                        name = "binance_${symbol.first.value.lowercase()}_usdt_chart_history_$year",
+//                        records = chartRecords
+//                    )
+//                )
+//            }
+//        }
 //        val depositRecords = BinanceDownloader.downloadDepositHistory()
 //        JsonExporter.export(
 //            DepositHistory(
