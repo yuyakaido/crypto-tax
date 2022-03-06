@@ -214,8 +214,7 @@ object TaxService : Service {
                             }
                         }
                         is FutureTradeRecord -> {
-                            // 先物取引履歴は取得原価の計算には影響を与えない
-                            BigDecimal.ZERO to BigDecimal.ZERO
+                            BigDecimal.ZERO to -it.feeAmount
                         }
                         is ExchangeRecord -> {
                             val nearestJpyPrice = getNearestJpyPrice(it.symbol.first, it.exchangedAt)
