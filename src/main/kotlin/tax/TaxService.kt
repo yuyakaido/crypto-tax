@@ -61,9 +61,7 @@ object TaxService : Service {
     }
 
     private fun getNearestUsdJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
-        return usdJpyChartRecords.firstOrNull {
-            it.date == tradedAt.toLocalDate()
-        }?.price ?: BigDecimal(115)
+        return usdJpyChartRecords.first { it.date == tradedAt.toLocalDate() }.price
     }
 
     private fun calculate(year: Year) {
