@@ -26,7 +26,16 @@ object JsonImporter : IO {
         )
     }
 
-    fun importTradeRecords(name: String): List<TradeRecord> {
+    fun importSpotTradeRecords(name: String): List<SpotTradeRecord> {
+        return RetrofitCreator.getJson().decodeFromString(
+            string = import(
+                name = name,
+                from = IO.Directory.Outputs
+            )
+        )
+    }
+
+    fun importFutureTradeRecords(name: String): List<FutureTradeRecord> {
         return RetrofitCreator.getJson().decodeFromString(
             string = import(
                 name = name,

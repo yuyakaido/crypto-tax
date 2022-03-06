@@ -24,14 +24,14 @@ object BybitService : Service {
 //        )
 //        val spotTradeRecords = BybitDownloader.downloadSpotTradeRecords()
 //        JsonExporter.export(
-//            TradeHistory(
+//            SpotTradeHistory(
 //                name = "bybit_spot_trade_history",
 //                records = spotTradeRecords
 //            )
 //        )
 //        val inverseTradeRecords = BybitDownloader.downloadInversePerpetualTradeRecords()
 //        JsonExporter.export(
-//            TradeHistory(
+//            FutureTradeHistory(
 //                name = "bybit_inverse_trade_history",
 //                records = inverseTradeRecords
 //            )
@@ -45,7 +45,7 @@ object BybitService : Service {
 //        )
 //        val usdtTradeRecords = BybitDownloader.downloadUSDTPerpetualTradeRecords()
 //        JsonExporter.export(
-//            TradeHistory(
+//            FutureTradeHistory(
 //                name = "bybit_usdt_trade_history",
 //                records = usdtTradeRecords
 //            )

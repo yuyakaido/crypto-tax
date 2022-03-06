@@ -4,13 +4,13 @@ import common.RetrofitCreator
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.encodeToJsonElement
-import model.TradeRecord
+import model.SpotTradeRecord
 
 @ExperimentalSerializationApi
-data class TradeHistory(
+data class SpotTradeHistory(
     override val name: String,
-    override val records: List<TradeRecord>
-) : JsonFile<TradeRecord> {
+    override val records: List<SpotTradeRecord>
+) : JsonFile<SpotTradeRecord> {
     override val json: JsonElement = RetrofitCreator.getJson()
         .encodeToJsonElement(records.sortedByDescending { it.tradedAt })
 }

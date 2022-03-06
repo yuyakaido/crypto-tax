@@ -2,7 +2,7 @@ package bitbank
 
 import common.RetrofitCreator
 import kotlinx.serialization.ExperimentalSerializationApi
-import model.TradeRecord
+import model.SpotTradeRecord
 
 @ExperimentalSerializationApi
 object BitbankDownloader {
@@ -21,7 +21,7 @@ object BitbankDownloader {
         )
         .create(BitbankHttpClient::class.java)
 
-    suspend fun downloadTradeHistory(): List<TradeRecord> {
+    suspend fun downloadTradeHistory(): List<SpotTradeRecord> {
         return client.getTradeHistory().data.trades.map { it.toTradeRecord() }
     }
 

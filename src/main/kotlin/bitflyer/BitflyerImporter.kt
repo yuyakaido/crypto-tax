@@ -80,7 +80,7 @@ object BitflyerImporter {
             }
     }
 
-    fun importTradeRecords(): List<TradeRecord> {
+    fun importTradeRecords(): List<SpotTradeRecord> {
         val rows = getFilteredRows(TRADE_TYPE_BUY) + getFilteredRows(TRADE_TYPE_SELL)
         return rows
             .map { columns ->
@@ -91,7 +91,7 @@ object BitflyerImporter {
                 val tradeAmount = columns[amountCurrency1Index].replace("-", "")
                 val feeAmount = columns[feeIndex].replace("-", "")
                 val feeAsset = Asset.first(pair)
-                TradeRecord(
+                SpotTradeRecord(
                     tradedAt = LocalDateTime.parse(tradedAt, formatter).atZone(ZoneId.systemDefault()),
                     symbol = Symbol.from(Asset.pair(pair)),
                     side = Side.from(side),

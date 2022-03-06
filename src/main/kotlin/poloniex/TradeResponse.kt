@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import model.Asset
 import model.Side
 import model.Symbol
-import model.TradeRecord
+import model.SpotTradeRecord
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDateTime
@@ -29,10 +29,10 @@ data class TradeResponse(
     companion object {
         private val FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")
     }
-    fun toTradeRecord(pair: Pair<Asset, Asset>): TradeRecord {
+    fun toTradeRecord(pair: Pair<Asset, Asset>): SpotTradeRecord {
         val symbol = Symbol.from(pair)
         val side = Side.from(type)
-        return TradeRecord(
+        return SpotTradeRecord(
             tradedAt = LocalDateTime
                 .parse(date, FORMATTER)
                 .atZone(ZoneOffset.UTC)

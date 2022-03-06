@@ -3,7 +3,7 @@ package bittrex
 import common.RetrofitCreator
 import kotlinx.serialization.ExperimentalSerializationApi
 import model.DepositRecord
-import model.TradeRecord
+import model.SpotTradeRecord
 import model.WithdrawRecord
 
 @ExperimentalSerializationApi
@@ -31,7 +31,7 @@ object BittrexDownloader {
         return client.getWithdrawHistory().map { it.toWithdrawRecord() }
     }
 
-    suspend fun downloadTradeHistory(): List<TradeRecord> {
+    suspend fun downloadTradeHistory(): List<SpotTradeRecord> {
         return client.getTradeHistory().map { it.toTradeRecord() }
     }
 

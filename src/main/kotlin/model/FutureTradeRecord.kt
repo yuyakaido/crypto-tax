@@ -6,10 +6,10 @@ import java.math.BigDecimal
 import java.time.ZonedDateTime
 
 @Serializable
-data class TradeRecord(
+data class FutureTradeRecord(
     @Contextual val tradedAt: ZonedDateTime,
     @Contextual val symbol: Symbol,
-    @Contextual val side: Side,
+    @Contextual val type: ExecType,
     @Contextual val tradePrice: BigDecimal,
     @Contextual val tradeAmount: BigDecimal,
     @Contextual val feeAmount: BigDecimal,
@@ -19,6 +19,10 @@ data class TradeRecord(
         return tradedAt
     }
     override fun asset(): Asset {
-        return symbol.first
+        return if (symbol.second == Asset.USDT) {
+            symbol.second
+        } else {
+            symbol.first
+        }
     }
 }

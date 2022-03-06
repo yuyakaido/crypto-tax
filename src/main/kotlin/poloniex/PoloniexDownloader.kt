@@ -7,7 +7,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonArray
 import model.Asset
 import model.ChartRecord
-import model.TradeRecord
+import model.SpotTradeRecord
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -68,7 +68,7 @@ object PoloniexDownloader {
         return client.getDepositWithdrawHistory()
     }
 
-    suspend fun downloadTradeRecords(): List<TradeRecord> {
+    suspend fun downloadTradeRecords(): List<SpotTradeRecord> {
         val response = client.getTradeHistory()
         return response.entries
             .flatMap { entry ->

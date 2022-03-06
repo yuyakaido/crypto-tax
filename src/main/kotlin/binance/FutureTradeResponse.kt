@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import model.Asset
 import model.Side
 import model.Symbol
-import model.TradeRecord
+import model.SpotTradeRecord
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.ZoneId
@@ -32,8 +32,8 @@ data class FutureTradeResponse(
     @SerialName("buyer") val buyer: Boolean,
     @SerialName("maker") val maker: Boolean
 ) {
-    fun toTradeRecord(symbol: Symbol): TradeRecord {
-        return TradeRecord(
+    fun toTradeRecord(symbol: Symbol): SpotTradeRecord {
+        return SpotTradeRecord(
             tradedAt = ZonedDateTime
                 .ofInstant(Instant.ofEpochMilli(time), ZoneOffset.UTC)
                 .withZoneSameInstant(ZoneId.systemDefault()),

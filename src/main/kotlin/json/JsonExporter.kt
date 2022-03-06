@@ -40,7 +40,14 @@ object JsonExporter : IO {
         )
     }
 
-    fun export(file: TradeHistory) {
+    fun export(file: SpotTradeHistory) {
+        export(
+            file = file,
+            into = IO.Directory.Outputs
+        )
+    }
+
+    fun export(file: FutureTradeHistory) {
         export(
             file = file,
             into = IO.Directory.Outputs

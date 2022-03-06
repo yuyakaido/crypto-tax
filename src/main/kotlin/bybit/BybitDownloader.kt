@@ -49,10 +49,10 @@ object BybitDownloader {
             .distinctBy { it.exchangedAt }
     }
 
-    suspend fun downloadSpotTradeRecords(): List<TradeRecord> {
+    suspend fun downloadSpotTradeRecords(): List<SpotTradeRecord> {
         println("Downloading bybit spot trade history")
 
-        val records = mutableListOf<TradeRecord>()
+        val records = mutableListOf<SpotTradeRecord>()
         val symbols = client.getSpotSymbolList().toSymbols()
         symbols.forEach { symbol ->
             println(symbol)
@@ -81,10 +81,10 @@ object BybitDownloader {
         return records
     }
 
-    suspend fun downloadInversePerpetualTradeRecords(): List<TradeRecord> {
+    suspend fun downloadInversePerpetualTradeRecords(): List<FutureTradeRecord> {
         println("Downloading bybit inverse perpetual trade history")
 
-        val records = mutableListOf<TradeRecord>()
+        val records = mutableListOf<FutureTradeRecord>()
         val symbols = listOf(
             Symbol.from(Asset.pair("BTC/USD")),
             Symbol.from(Asset.pair("ETH/USD")),
@@ -101,7 +101,7 @@ object BybitDownloader {
                     symbol = symbol.toBybitString(),
                     page = page++
                 )
-                records.addAll(response.toTradeRecords(symbol))
+                records.addAll(response.toFutureTradeRecords(symbol))
                 val size = response.result.tradeList?.size ?: 0
                 if (size < 50) {
                     break
@@ -145,13 +145,16 @@ object BybitDownloader {
         return records
     }
 
-    suspend fun downloadUSDTPerpetualTradeRecords(): List<TradeRecord> {
+    suspend fun downloadUSDTPerpetualTradeRecords(): List<FutureTradeRecord> {
         println("Downloading bybit USDT perpetual trade history")
 
-        val records = mutableListOf<TradeRecord>()
-        val symbols = client.getPerpetualSymbolList()
-            .toSymbols()
-            .filter { it.second == Asset.USDT }
+        val records = mutableListOf<FutureTradeRecord>()
+        val symbols = listOf(
+            Symbol.from(Asset.pair("BTC/USDT")),
+            Symbol.from(Asset.pair("ETH/USDT")),
+            Symbol.from(Asset.pair("XRP/USDT")),
+            Symbol.from(Asset.pair("BIT/USDT"))
+        )
         symbols.forEach { symbol ->
             println(symbol)
             var page = 1
@@ -160,7 +163,7 @@ object BybitDownloader {
                     symbol = symbol.toBybitString(),
                     page = page++
                 )
-                records.addAll(response.toTradeRecords(symbol))
+                records.addAll(response.toFutureTradeRecords(symbol))
                 val size = response.result.data?.size?: 0
                 if (size < 50) {
                     break
@@ -177,7 +180,10 @@ object BybitDownloader {
 
         val records = mutableListOf<ProfitLossRecord>()
         val symbols = listOf(
-            Symbol.from(Asset.pair("BIT/USDT")),
+            Symbol.from(Asset.pair("BTC/USDT")),
+            Symbol.from(Asset.pair("ETH/USDT")),
+            Symbol.from(Asset.pair("XRP/USDT")),
+            Symbol.from(Asset.pair("BIT/USDT"))
         )
         symbols.forEach { symbol ->
             println(symbol)

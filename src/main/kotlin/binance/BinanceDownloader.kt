@@ -44,7 +44,7 @@ object BinanceDownloader {
         return spotClient.getWithdrawHistory().map { it.toWithdrawRecord() }
     }
 
-    suspend fun downloadSpotTradeHistory(): List<TradeRecord> {
+    suspend fun downloadSpotTradeHistory(): List<SpotTradeRecord> {
         println("Downloading binance spot trade history")
 
 //        val symbols = client.getSymbols().toSymbols()
@@ -96,7 +96,7 @@ object BinanceDownloader {
             }
     }
 
-    suspend fun downloadCoinFutureTradeHistory(): List<TradeRecord> {
+    suspend fun downloadCoinFutureTradeHistory(): List<SpotTradeRecord> {
         println("Downloading binance coin future trade history")
 
         val symbols = listOf(
@@ -111,7 +111,7 @@ object BinanceDownloader {
             LocalDateTime.of(2021, 1, 1, 0, 0, 0),
             ZoneOffset.UTC
         )
-        val records = mutableListOf<TradeRecord>()
+        val records = mutableListOf<SpotTradeRecord>()
         symbols.forEach { symbol ->
             val responses = derivativeClient.getCoinFutureTradeHistory(
                 symbol = "${symbol.toBinanceString()}_PERP",

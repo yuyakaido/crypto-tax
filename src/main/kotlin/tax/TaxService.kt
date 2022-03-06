@@ -22,7 +22,7 @@ object TaxService : Service {
     private var wallet = Wallet()
 
     override suspend fun execute() {
-//        (2017..2021).forEach { calculate(Year.of(it)) }
+        (2017..2021).forEach { calculate(Year.of(it)) }
     }
 
     private fun getNearestJpyPrice(asset: Asset, tradedAt: ZonedDateTime): BigDecimal {
@@ -69,22 +69,22 @@ object TaxService : Service {
     private fun calculate(year: Year) {
         println("================ ${year.value} ================")
 
-        val bitflyerTradeRecords = JsonImporter.importTradeRecords("bitflyer_trade_history")
+        val bitflyerTradeRecords = JsonImporter.importSpotTradeRecords("bitflyer_trade_history")
         val bitflyerDistributionRecords = JsonImporter.importDistributionRecords("bitflyer_distribution_history")
         val bitflyerWithdrawRecords = JsonImporter.importWithdrawRecords("bitflyer_withdraw_history")
-        val bittrexTradeRecords = JsonImporter.importTradeRecords("bittrex_trade_history")
+        val bittrexTradeRecords = JsonImporter.importSpotTradeRecords("bittrex_trade_history")
         val bittrexWithdrawRecords = JsonImporter.importWithdrawRecords("bittrex_withdraw_history")
-        val poloniexTradeRecords = JsonImporter.importTradeRecords("poloniex_trade_history")
+        val poloniexTradeRecords = JsonImporter.importSpotTradeRecords("poloniex_trade_history")
         val poloniexDistributionRecords = JsonImporter.importDistributionRecords("poloniex_distribution_history")
         val poloniexWithdrawRecords = JsonImporter.importWithdrawRecords("poloniex_withdraw_history")
-        val bitbankTradeRecords = JsonImporter.importTradeRecords("bitbank_trade_history")
-        val binanceSpotTradeRecords = JsonImporter.importTradeRecords("binance_spot_trade_history")
+        val bitbankTradeRecords = JsonImporter.importSpotTradeRecords("bitbank_trade_history")
+        val binanceSpotTradeRecords = JsonImporter.importSpotTradeRecords("binance_spot_trade_history")
         val binanceDistributionRecords = JsonImporter.importDistributionRecords("binance_distribution_history")
-        val binanceProfitLossRecords = JsonImporter.importProfitLossRecords("binance_coin_future_profit_loss_history")
+//        val binanceProfitLossRecords = JsonImporter.importProfitLossRecords("binance_coin_future_profit_loss_history")
         val bybitExchangeRecords = JsonImporter.importExchangeRecords("bybit_exchange_history")
-        val bybitSpotTradeRecords = JsonImporter.importTradeRecords("bybit_spot_trade_history")
-        val bybitInverseFutureProfitLossRecords = JsonImporter.importProfitLossRecords("bybit_inverse_profit_loss_history")
-        val bybitUsdtFutureProfitLossRecords = JsonImporter.importProfitLossRecords("bybit_usdt_profit_loss_history")
+        val bybitSpotTradeRecords = JsonImporter.importSpotTradeRecords("bybit_spot_trade_history")
+        val bybitInverseTradeRecords = JsonImporter.importFutureTradeRecords("bybit_inverse_trade_history")
+        val bybitInverseProfitLossRecords = JsonImporter.importProfitLossRecords("bybit_inverse_profit_loss_history")
         val allRecords = bitflyerTradeRecords
             .plus(bitflyerDistributionRecords)
             .plus(bitflyerWithdrawRecords)
@@ -96,11 +96,11 @@ object TaxService : Service {
             .plus(bitbankTradeRecords)
             .plus(binanceSpotTradeRecords)
             .plus(binanceDistributionRecords)
-            .plus(binanceProfitLossRecords)
+//            .plus(binanceProfitLossRecords)
             .plus(bybitExchangeRecords)
             .plus(bybitSpotTradeRecords)
-            .plus(bybitInverseFutureProfitLossRecords)
-            .plus(bybitUsdtFutureProfitLossRecords)
+            .plus(bybitInverseTradeRecords)
+            .plus(bybitInverseProfitLossRecords)
             .filter { it.recordedAt().year == year.value }
             .sortedBy { it.recordedAt() }
 
@@ -108,11 +108,14 @@ object TaxService : Service {
             holdings = allRecords.groupBy(
                 keySelector = {
                     when (it) {
-                        is TradeRecord -> {
+                        is SpotTradeRecord -> {
                             when (it.side) {
                                 Side.Buy -> it.symbol.first
                                 Side.Sell -> it.symbol.second
                             }
+                        }
+                        is FutureTradeRecord -> {
+                            it.asset()
                         }
                         is ExchangeRecord -> {
                             it.asset()
@@ -130,7 +133,7 @@ object TaxService : Service {
                 },
                 valueTransform = {
                     when (it) {
-                        is TradeRecord -> {
+                        is SpotTradeRecord -> {
                             when (it.side) {
                                 Side.Buy -> {
                                     when (val quoteAsset = it.symbol.second) {
@@ -159,6 +162,10 @@ object TaxService : Service {
                                 }
                             }
                         }
+                        is FutureTradeRecord -> {
+                            // 先物取引履歴は取得原価の計算には影響を与えない
+                            BigDecimal.ZERO to BigDecimal.ZERO
+                        }
                         is ExchangeRecord -> {
                             val nearestJpyPrice = getNearestJpyPrice(it.symbol.first, it.exchangedAt)
                             nearestJpyPrice to it.toAmount
@@ -172,7 +179,7 @@ object TaxService : Service {
                             BigDecimal.ZERO to BigDecimal.ZERO
                         }
                         is ProfitLossRecord -> {
-                            // 先物取引履歴は取得原価の計算には影響を与えない
+                            // 損益履歴は取得原価の計算には影響を与えない
                             BigDecimal.ZERO to BigDecimal.ZERO
                         }
                     }
@@ -211,7 +218,7 @@ object TaxService : Service {
             .filter { it.recordedAt().year == year.value }
             .map {
                 when (it) {
-                    is TradeRecord -> {
+                    is SpotTradeRecord -> {
                         when (it.side) {
                             Side.Buy -> {
                                 when (val quoteAsset = it.symbol.second) {
@@ -271,6 +278,14 @@ object TaxService : Service {
                             }
                         }
                     }
+                    is FutureTradeRecord -> {
+                        val baseAsset = it.asset()
+                        val nearestJpyPrice = getNearestJpyPrice(baseAsset, it.tradedAt)
+                        return@map baseAsset to ProfitLoss(
+                            record = it,
+                            value = it.feeAmount.multiply(nearestJpyPrice)
+                        )
+                    }
                     is ExchangeRecord -> {
                         // 暗号資産同士を交換した場合、QuoteAssetを利確した扱いとなる
                         val quoteAsset = it.symbol.second
@@ -311,9 +326,10 @@ object TaxService : Service {
                         return@map it.asset to profitLoss
                     }
                     is ProfitLossRecord -> {
+                        val nearestJpyPrice = getNearestJpyPrice(it.asset(), it.tradedAt)
                         val profitLoss = ProfitLoss(
                             record = it,
-                            value = it.value
+                            value = it.value.multiply(nearestJpyPrice)
                         )
                         return@map it.asset() to profitLoss
                     }

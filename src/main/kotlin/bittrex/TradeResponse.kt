@@ -7,7 +7,7 @@ import kotlinx.serialization.json.JsonObject
 import model.Asset
 import model.Side
 import model.Symbol
-import model.TradeRecord
+import model.SpotTradeRecord
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.ZoneId
@@ -33,9 +33,9 @@ data class TradeResponse(
     @SerialName("closedAt") val closedAt: String,
     @SerialName("orderToCancel") val orderToCancel: JsonObject? = null
 ) {
-    fun toTradeRecord(): TradeRecord {
+    fun toTradeRecord(): SpotTradeRecord {
         val symbol = Symbol.from(Asset.pair(marketSymbol))
-        return TradeRecord(
+        return SpotTradeRecord(
             tradedAt = ZonedDateTime.parse(closedAt).withZoneSameInstant(ZoneId.systemDefault()),
             symbol = symbol,
             side = Side.from(direction),

@@ -21,7 +21,7 @@ data class IncomeResponse(
     @SerialName("tranId") val tranId: Long,
     @SerialName("tradeId") val tradeId: String
 ) {
-    fun toProfitLossRecord(symbol: Symbol): ProfitLossRecord? {
+    fun toProfitLossRecord(symbol: Symbol): ProfitLossRecord {
         return ProfitLossRecord(
             tradedAt = ZonedDateTime.ofInstant(
                 Instant.ofEpochMilli(time), ZoneId.systemDefault()
