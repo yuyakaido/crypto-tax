@@ -337,9 +337,7 @@ object TaxService : Service {
             }
 
         println("================ Holdings and Average Price ================")
-        wallet.holdings
-            .filterValues { it.amount > BigDecimal.ZERO }
-            .forEach { println(it) }
+        wallet.holdings.forEach { println(it) }
 
         println("================ Profit & Loss ================")
         var totalProfitLoss = BigDecimal.ZERO

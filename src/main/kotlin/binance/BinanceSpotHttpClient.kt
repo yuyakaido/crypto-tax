@@ -26,7 +26,8 @@ interface BinanceSpotHttpClient {
 
     @GET("api/v3/myTrades")
     suspend fun getSpotTradeHistory(
-        @Query("symbol") symbol: String
+        @Query("symbol") symbol: String,
+        @Query("limit") limit: Long = 1000
     ): List<SpotTradeResponse>
 
     @GET("sapi/v1/asset/assetDividend")

@@ -63,7 +63,7 @@ object BinanceService : Service {
 //        )
 //        val spotTradeRecords = BinanceDownloader.downloadSpotTradeHistory()
 //        JsonExporter.export(
-//            TradeHistory(
+//            SpotTradeHistory(
 //                name = "binance_spot_trade_history",
 //                records = spotTradeRecords
 //            )

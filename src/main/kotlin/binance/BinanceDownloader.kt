@@ -139,7 +139,8 @@ object BinanceDownloader {
                     it.copy(
                         symbol = it.symbol.copy(
                             first = Asset.single("BCH")
-                        )
+                        ),
+                        feeAsset = Asset.single("BCH")
                     )
                 } else {
                     it
