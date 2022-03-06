@@ -4,6 +4,7 @@ import common.Service
 import json.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import model.Asset
+import model.ChartRecord
 import model.Symbol
 import java.time.LocalDateTime
 
@@ -24,6 +25,7 @@ object BinanceService : Service {
 //            )
 //        }
 //        val symbols = listOf(
+//            Symbol.from(Asset.pair("BTC/USDT")),
 //            Symbol.from(Asset.pair("ETH/USDT")),
 //            Symbol.from(Asset.pair("XRP/USDT")),
 //            Symbol.from(Asset.pair("EOS/USDT")),
@@ -32,7 +34,7 @@ object BinanceService : Service {
 //            Symbol.from(Asset.pair("LTC/USDT")),
 //            Symbol.from(Asset.pair("BCH/USDT")),
 //            Symbol.from(Asset.pair("DOGE/USDT")),
-//            Symbol.from(Asset.pair("ADA/USTD")),
+//            Symbol.from(Asset.pair("ADA/USDT")),
 //        )
 //        symbols.forEach { symbol ->
 //            (2021..2021).forEach { year ->
@@ -42,6 +44,25 @@ object BinanceService : Service {
 //                JsonExporter.export(
 //                    ChartHistory(
 //                        name = "binance_${symbol.first.value.lowercase()}_usdt_chart_history_$year",
+//                        records = chartRecords
+//                    )
+//                )
+//            }
+//        }
+//        val rateRecords = JsonImporter.importRateRecords("macrotrends_usd_jpy_chart_history")
+//        symbols.forEach { symbol ->
+//            (2021..2021).forEach { year ->
+//                val chartRecords = JsonImporter.importChartRecords("binance_${symbol.first.value.lowercase()}_usdt_chart_history_$year")
+//                    .map { chart ->
+//                        val rate = rateRecords.first { it.date == chart.date.toLocalDate() }
+//                        ChartRecord(
+//                            date = chart.date,
+//                            price = chart.price.multiply(rate.price)
+//                        )
+//                    }
+//                JsonExporter.export(
+//                    ChartHistory(
+//                        name = "yuyakaido_${symbol.first.value.lowercase()}_jpy_chart_history_$year",
 //                        records = chartRecords
 //                    )
 //                )

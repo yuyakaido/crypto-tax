@@ -3,7 +3,6 @@ package poloniex
 import common.Service
 import json.*
 import kotlinx.serialization.ExperimentalSerializationApi
-import java.time.LocalDateTime
 
 @ExperimentalSerializationApi
 object PoloniexService : Service {
@@ -30,22 +29,11 @@ object PoloniexService : Service {
 //        )
 //        val tradeRecords = PoloniexDownloader.downloadTradeRecords()
 //        JsonExporter.export(
-//            TradeHistory(
+//            SpotTradeHistory(
 //                name = "poloniex_trade_history",
 //                records = tradeRecords
 //            )
 //        )
-//        (2017..2021).forEach { year ->
-//            val from = LocalDateTime.of(year, 1, 1, 0, 0 ,0)
-//            val to = LocalDateTime.of(year, 12, 31, 23, 59, 59)
-//            val chartRecords = PoloniexDownloader.downloadChartRecords(from = from, to = to)
-//            JsonExporter.export(
-//                ChartHistory(
-//                    name = "poloniex_btc_usdt_chart_history_$year",
-//                    records = chartRecords
-//                )
-//            )
-//        }
     }
 
 }

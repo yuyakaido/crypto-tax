@@ -16,6 +16,15 @@ object TaxService : Service {
         .plus(JsonImporter.importChartRecords("yuyakaido_btc_jpy_chart_history_2019"))
         .plus(JsonImporter.importChartRecords("yuyakaido_btc_jpy_chart_history_2020"))
         .plus(JsonImporter.importChartRecords("yuyakaido_btc_jpy_chart_history_2021"))
+    private val ethJpyChartRecords = JsonImporter.importChartRecords("yuyakaido_eth_jpy_chart_history_2021")
+    private val xrpJpyChartRecords = JsonImporter.importChartRecords("yuyakaido_xrp_jpy_chart_history_2021")
+    private val eosJpyChartRecords = JsonImporter.importChartRecords("yuyakaido_eos_jpy_chart_history_2021")
+    private val dotJpyChartRecords = JsonImporter.importChartRecords("yuyakaido_dot_jpy_chart_history_2021")
+    private val egldJpyChartRecords = JsonImporter.importChartRecords("yuyakaido_egld_jpy_chart_history_2021")
+    private val ltcJpyChartRecords = JsonImporter.importChartRecords("yuyakaido_ltc_jpy_chart_history_2021")
+    private val bchJpyChartRecords = JsonImporter.importChartRecords("yuyakaido_bch_jpy_chart_history_2021")
+    private val dogeJpyChartRecords = JsonImporter.importChartRecords("yuyakaido_doge_jpy_chart_history_2021")
+    private val adaJpyChartRecords = JsonImporter.importChartRecords("yuyakaido_ada_jpy_chart_history_2021")
 
     private val usdJpyChartRecords = JsonImporter.importRateRecords("macrotrends_usd_jpy_chart_history")
 
@@ -32,32 +41,74 @@ object TaxService : Service {
             Asset.XRP -> getNearestXrpJpyPrice(tradedAt)
             Asset.EOS -> getNearestEosJpyPrice(tradedAt)
             Asset.DOT -> getNearestDotJpyPrice(tradedAt)
+            Asset.EGLD -> getNearestEgldJpyPrice(tradedAt)
+            Asset.LTC -> getNearestLctJpyPrice(tradedAt)
+            Asset.BCH -> getNearestBchJpyPrice(tradedAt)
+            Asset.DOGE -> getNearestDogeJpyPrice(tradedAt)
+            Asset.ADA -> getNearestAdaJpyPrice(tradedAt)
             Asset.USDT, Asset.BUSD, Asset.USDC -> getNearestUsdJpyPrice(tradedAt)
             else -> throw RuntimeException("Unknown asset: $asset")
         }
     }
 
     private fun getNearestBtcJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
-        val range = tradedAt to tradedAt.plusMinutes(5)
         return btcJpyChartRecords.first {
-            range.first < it.date && it.date < range.second
+            tradedAt.toEpochSecond() <= it.date.toEpochSecond()
         }.price
     }
 
     private fun getNearestEthJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
-        return BigDecimal("200000")
+        return ethJpyChartRecords.first {
+            tradedAt.toEpochSecond() <= it.date.toEpochSecond()
+        }.price
     }
 
     private fun getNearestXrpJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
-        return BigDecimal("100")
+        return xrpJpyChartRecords.first {
+            tradedAt.toEpochSecond() <= it.date.toEpochSecond()
+        }.price
     }
 
     private fun getNearestEosJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
-        return BigDecimal("400")
+        return eosJpyChartRecords.first {
+            tradedAt.toEpochSecond() <= it.date.toEpochSecond()
+        }.price
     }
 
     private fun getNearestDotJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
-        return BigDecimal("3000")
+        return dotJpyChartRecords.first {
+            tradedAt.toEpochSecond() <= it.date.toEpochSecond()
+        }.price
+    }
+
+    private fun getNearestEgldJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
+        return egldJpyChartRecords.first {
+            tradedAt.toEpochSecond() <= it.date.toEpochSecond()
+        }.price
+    }
+
+    private fun getNearestLctJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
+        return ltcJpyChartRecords.first {
+            tradedAt.toEpochSecond() <= it.date.toEpochSecond()
+        }.price
+    }
+
+    private fun getNearestBchJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
+        return bchJpyChartRecords.first {
+            tradedAt.toEpochSecond() <= it.date.toEpochSecond()
+        }.price
+    }
+
+    private fun getNearestDogeJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
+        return dogeJpyChartRecords.first {
+            tradedAt.toEpochSecond() <= it.date.toEpochSecond()
+        }.price
+    }
+
+    private fun getNearestAdaJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
+        return adaJpyChartRecords.first {
+            tradedAt.toEpochSecond() <= tradedAt.toEpochSecond()
+        }.price
     }
 
     private fun getNearestUsdJpyPrice(tradedAt: ZonedDateTime): BigDecimal {
@@ -95,8 +146,8 @@ object TaxService : Service {
             .plus(bitbankTradeRecords)
             .plus(binanceSpotTradeRecords)
             .plus(binanceDistributionRecords)
-//            .plus(binanceFutureTradeRecords)
-//            .plus(binanceFutureProfitLossRecords)
+            .plus(binanceFutureTradeRecords)
+            .plus(binanceFutureProfitLossRecords)
             .plus(bybitExchangeRecords)
             .plus(bybitSpotTradeRecords)
             .plus(bybitInverseTradeRecords)
@@ -281,9 +332,10 @@ object TaxService : Service {
                     is FutureTradeRecord -> {
                         val baseAsset = it.asset()
                         val nearestJpyPrice = getNearestJpyPrice(baseAsset, it.tradedAt)
+                        val profitLoss = -it.feeAmount.multiply(nearestJpyPrice)
                         return@map baseAsset to ProfitLoss(
                             record = it,
-                            value = it.feeAmount.multiply(nearestJpyPrice)
+                            value = profitLoss
                         )
                     }
                     is ExchangeRecord -> {
