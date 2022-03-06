@@ -28,6 +28,11 @@ object BinanceService : Service {
 //            Symbol.from(Asset.pair("XRP/USDT")),
 //            Symbol.from(Asset.pair("EOS/USDT")),
 //            Symbol.from(Asset.pair("DOT/USDT")),
+//            Symbol.from(Asset.pair("EGLD/USDT")),
+//            Symbol.from(Asset.pair("LTC/USDT")),
+//            Symbol.from(Asset.pair("BCH/USDT")),
+//            Symbol.from(Asset.pair("DOGE/USDT")),
+//            Symbol.from(Asset.pair("ADA/USTD")),
 //        )
 //        symbols.forEach { symbol ->
 //            (2021..2021).forEach { year ->
