@@ -27,7 +27,10 @@ object BybitImporter {
         val regex = Regex("\".+\"")
 
         return rows.map { row ->
-            val sanitizedRow = row.replace(regex) { it.value.replace(",", "") }
+            val sanitizedRow = row.replace(regex) {
+                it.value.replace(",", "")
+                    .replace("\"", "")
+            }
             val columns = sanitizedRow.split(",")
 
             val effectiveUntilValue = columns[effectiveUntilIndex]
@@ -60,7 +63,10 @@ object BybitImporter {
         val regex = Regex("\".+\"")
 
         return rows.map { row ->
-            val sanitizedRow = row.replace(regex) { it.value.replace(",", "") }
+            val sanitizedRow = row.replace(regex) {
+                it.value.replace(",", "")
+                    .replace("\"", "")
+            }
             val columns = sanitizedRow.split(",")
 
             val assetEarnedValue = columns[assetEarnedIndex]
@@ -94,7 +100,10 @@ object BybitImporter {
         val regex = Regex("\".+\"")
 
         return rows.map { row ->
-            val sanitizedRow = row.replace(regex) { it.value.replace(",", "") }
+            val sanitizedRow = row.replace(regex) {
+                it.value.replace(",", "")
+                    .replace("\"", "")
+            }
             val columns = sanitizedRow.split(",")
 
             val assetEarnedValue = columns[assetEarnedIndex]
@@ -104,6 +113,43 @@ object BybitImporter {
             val distributedAt = LocalDateTime.parse(distributionTimeValue, formatter).atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault())
             val asset = Asset.single(assetEarnedValue)
             val amount = BigDecimal(yieldValue)
+
+            DistributionRecord(
+                distributedAt = distributedAt,
+                asset = asset,
+                amount = amount
+            )
+        }
+    }
+
+    fun importAirdropDistributionRecords(): List<DistributionRecord> {
+        val file = File("${directory.path}/bybit_airdrop_history.csv")
+        val lines = file.readLines()
+        val header = lines.first()
+        val headers = header.split(",")
+        val rows = lines.subList(1, lines.size)
+
+        val coinIndex = headers.indexOf("Coin")
+        val quantityIndex = headers.indexOf("Quantity")
+        val dateAndTimeIndex = headers.indexOf("Date & Time")
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val regex = Regex("\".+\"")
+
+        return rows.map { row ->
+            val sanitizedRow = row.replace(regex) {
+                it.value.replace(",", "")
+                    .replace("\"", "")
+            }
+            val columns = sanitizedRow.split(",")
+
+            val coinValue = columns[coinIndex]
+            val quantityValue = columns[quantityIndex]
+            val dateAndTimeValue = columns[dateAndTimeIndex]
+
+            val distributedAt = LocalDateTime.parse(dateAndTimeValue, formatter).atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault())
+            val asset = Asset.single(coinValue)
+            val amount = BigDecimal(quantityValue)
 
             DistributionRecord(
                 distributedAt = distributedAt,

@@ -140,6 +140,7 @@ object TaxService : Service {
         val bybitFlexibleStakingDistributionRecords = JsonImporter.importDistributionRecords("bybit_flexible_staking_distribution_history")
         val bybitDefiMiningDistributionRecords = JsonImporter.importDistributionRecords("bybit_defi_mining_distribution_history")
         val bybitLaunchpoolDistributionRecords = JsonImporter.importDistributionRecords("bybit_launchpool_distribution_history")
+        val bybitAirdropDistributionRecords = JsonImporter.importDistributionRecords("bybit_airdrop_distribution_history")
         val bybitWithdrawRecords = JsonImporter.importWithdrawRecords("bybit_withdraw_history")
         val allRecords = bitflyerTradeRecords
             .plus(bitflyerDistributionRecords)
@@ -163,6 +164,7 @@ object TaxService : Service {
             .plus(bybitFlexibleStakingDistributionRecords)
             .plus(bybitDefiMiningDistributionRecords)
             .plus(bybitLaunchpoolDistributionRecords)
+            .plus(bybitAirdropDistributionRecords)
             .plus(bybitWithdrawRecords)
             .filter { it.recordedAt().year == year.value }
             .sortedBy { it.recordedAt() }

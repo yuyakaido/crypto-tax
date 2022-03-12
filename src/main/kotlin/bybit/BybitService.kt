@@ -78,6 +78,13 @@ object BybitService : Service {
 //                records = launchpoolDistributionRecords
 //            )
 //        )
+//        val airdropDistributionRecords = BybitImporter.importAirdropDistributionRecords()
+//        JsonExporter.export(
+//            DistributionHistory(
+//                name = "bybit_airdrop_distribution_history",
+//                records = airdropDistributionRecords
+//            )
+//        )
     }
 
 }
