@@ -137,6 +137,7 @@ object TaxService : Service {
         val bybitInverseProfitLossRecords = JsonImporter.importProfitLossRecords("bybit_inverse_profit_loss_history")
         val bybitUsdtTradeRecords = JsonImporter.importFutureTradeRecords("bybit_usdt_trade_history")
         val bybitUsdtProfitLossRecords = JsonImporter.importProfitLossRecords("bybit_usdt_profit_loss_history")
+        val bybitDefiMiningDistributionRecords = JsonImporter.importDistributionRecords("bybit_defi_mining_distribution_history")
         val bybitWithdrawRecords = JsonImporter.importWithdrawRecords("bybit_withdraw_history")
         val allRecords = bitflyerTradeRecords
             .plus(bitflyerDistributionRecords)
@@ -157,6 +158,7 @@ object TaxService : Service {
             .plus(bybitInverseProfitLossRecords)
             .plus(bybitUsdtTradeRecords)
             .plus(bybitUsdtProfitLossRecords)
+            .plus(bybitDefiMiningDistributionRecords)
             .plus(bybitWithdrawRecords)
             .filter { it.recordedAt().year == year.value }
             .sortedBy { it.recordedAt() }
@@ -362,6 +364,7 @@ object TaxService : Service {
                             value = when (it.asset) {
                                 Asset.JPY -> it.amount
                                 Asset.BTC -> it.amount.multiply(getNearestBtcJpyPrice(it.distributedAt))
+                                Asset.USDT -> it.amount.multiply(getNearestUsdJpyPrice(it.distributedAt))
                                 else -> BigDecimal.ZERO
                             }
                         )

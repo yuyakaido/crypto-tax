@@ -57,6 +57,13 @@ object BybitService : Service {
 //                records = usdtProfitLossRecords
 //            )
 //        )
+//        val defiMiningDistributionRecords = BybitImporter.importDefiMiningRecords()
+//        JsonExporter.export(
+//            DistributionHistory(
+//                name = "bybit_defi_mining_distribution_history",
+//                records = defiMiningDistributionRecords
+//            )
+//        )
     }
 
 }
