@@ -15,6 +15,10 @@ data class ProfitLossRecord(
         return tradedAt
     }
     override fun asset(): Asset {
-        return symbol.first
+        return if (symbol.second == Asset.USDT) {
+            symbol.second
+        } else {
+            symbol.first
+        }
     }
 }
