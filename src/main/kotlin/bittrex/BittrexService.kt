@@ -1,6 +1,10 @@
 package bittrex
 
 import common.Service
+import json.DepositHistory
+import json.JsonExporter
+import json.SpotTradeHistory
+import json.WithdrawHistory
 import kotlinx.serialization.ExperimentalSerializationApi
 
 @ExperimentalSerializationApi
@@ -23,7 +27,7 @@ object BittrexService : Service {
 //        )
 //        val tradeRecords = BittrexDownloader.downloadTradeHistory()
 //        JsonExporter.export(
-//            TradeHistory(
+//            SpotTradeHistory(
 //                name = "bittrex_trade_history",
 //                records = tradeRecords
 //            )
