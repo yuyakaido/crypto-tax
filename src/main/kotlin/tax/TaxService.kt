@@ -137,6 +137,7 @@ object TaxService : Service {
         val bybitInverseProfitLossRecords = JsonImporter.importProfitLossRecords("bybit_inverse_profit_loss_history")
         val bybitUsdtTradeRecords = JsonImporter.importFutureTradeRecords("bybit_usdt_trade_history")
         val bybitUsdtProfitLossRecords = JsonImporter.importProfitLossRecords("bybit_usdt_profit_loss_history")
+        val bybitFlexibleStakingDistributionRecords = JsonImporter.importDistributionRecords("bybit_flexible_staking_distribution_history")
         val bybitDefiMiningDistributionRecords = JsonImporter.importDistributionRecords("bybit_defi_mining_distribution_history")
         val bybitWithdrawRecords = JsonImporter.importWithdrawRecords("bybit_withdraw_history")
         val allRecords = bitflyerTradeRecords
@@ -158,6 +159,7 @@ object TaxService : Service {
             .plus(bybitInverseProfitLossRecords)
             .plus(bybitUsdtTradeRecords)
             .plus(bybitUsdtProfitLossRecords)
+            .plus(bybitFlexibleStakingDistributionRecords)
             .plus(bybitDefiMiningDistributionRecords)
             .plus(bybitWithdrawRecords)
             .filter { it.recordedAt().year == year.value }
