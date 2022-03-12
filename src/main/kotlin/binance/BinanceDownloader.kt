@@ -88,52 +88,56 @@ object BinanceDownloader {
     }
 
     suspend fun downloadDepositHistory(): List<DepositRecord> {
+        println("Downloading binance deposit history")
         return spotClient.getDepositHistory().map { it.toDepositRecord() }
     }
 
     suspend fun downloadWithdrawHistory(): List<WithdrawRecord> {
+        println("Downloading binance withdraw history")
         return spotClient.getWithdrawHistory().map { it.toWithdrawRecord() }
     }
 
     suspend fun downloadSpotTradeHistory(): List<SpotTradeRecord> {
         println("Downloading binance spot trade history")
 
-//        val symbols = client.getSymbols().toSymbols()
+//        val symbols = spotClient.getSymbols().toSymbols()
 
         val symbols = listOf(
-            Symbol.from(Asset.pair("BCCBTC")),
-            Symbol.from(Asset.pair("SHIBUSDT")),
-            Symbol.from(Asset.pair("XRPUSDT")),
-            Symbol.from(Asset.pair("FILUSDT")),
-            Symbol.from(Asset.pair("BNBUSDT")),
-            Symbol.from(Asset.pair("BUSDUSDT")),
-            Symbol.from(Asset.pair("IOSTBUSD")),
-            Symbol.from(Asset.pair("ADABUSD")),
-            Symbol.from(Asset.pair("DOTBUSD")),
-            Symbol.from(Asset.pair("DOGEBUSD")),
-            Symbol.from(Asset.pair("SHIBBUSD")),
-            Symbol.from(Asset.pair("QTUMBUSD")),
-            Symbol.from(Asset.pair("DARBUSD")),
-            Symbol.from(Asset.pair("SANDBUSD")),
-            Symbol.from(Asset.pair("BTCBUSD")),
-            Symbol.from(Asset.pair("MATICBUSD")),
-            Symbol.from(Asset.pair("CHZBUSD")),
-            Symbol.from(Asset.pair("DOTBUSD")),
-            Symbol.from(Asset.pair("CHZUSDT")),
-            Symbol.from(Asset.pair("LTCUSDT")),
-            Symbol.from(Asset.pair("XLMUSDT"))
+            Symbol.from(Asset.pair("BCC/BTC")),
+            Symbol.from(Asset.pair("SHIB/USDT")),
+            Symbol.from(Asset.pair("XRP/USDT")),
+            Symbol.from(Asset.pair("FIL/USDT")),
+            Symbol.from(Asset.pair("BNB/USDT")),
+            Symbol.from(Asset.pair("BUSD/USDT")),
+            Symbol.from(Asset.pair("IOST/BUSD")),
+            Symbol.from(Asset.pair("ADA/BUSD")),
+            Symbol.from(Asset.pair("DOT/BUSD")),
+            Symbol.from(Asset.pair("DOGE/BUSD")),
+            Symbol.from(Asset.pair("SHIB/BUSD")),
+            Symbol.from(Asset.pair("QTUM/BUSD")),
+            Symbol.from(Asset.pair("DAR/BUSD")),
+            Symbol.from(Asset.pair("SAND/BUSD")),
+            Symbol.from(Asset.pair("BTC/BUSD")),
+            Symbol.from(Asset.pair("MATIC/BUSD")),
+            Symbol.from(Asset.pair("CHZ/BUSD")),
+            Symbol.from(Asset.pair("DOT/BUSD")),
+            Symbol.from(Asset.pair("CHZ/USDT")),
+            Symbol.from(Asset.pair("LTC/USDT")),
+            Symbol.from(Asset.pair("XLM/USDT"))
         )
 
-        val responses = mutableListOf<SpotTradeResponse>()
-        symbols.forEach {
-            val response = spotClient.getSpotTradeHistory(symbol = it.toBinanceString())
-            responses.addAll(response)
-            println("Downloaded trade history of $it: ${response.size}")
+        val responses = mutableMapOf<Symbol, List<SpotTradeResponse>>()
+        symbols.forEach { symbol ->
+            val response = spotClient.getSpotTradeHistory(symbol = symbol.toBinanceString())
+            responses[symbol] = response
+            println("$symbol: ${response.size}")
             delay(5000)
         }
 
         return responses
-            .map { it.toTradeRecord() }
+            .flatMap { entry ->
+                entry.value.map { it.toTradeRecord(entry.key) }
+            }
             .map {
                 if (it.asset() == Asset("BCC")) {
                     it.copy(
@@ -169,7 +173,7 @@ object BinanceDownloader {
                 symbol = "${symbol.toBinanceString()}_PERP",
                 startTime = startTime.toInstant().toEpochMilli()
             )
-            println("Downloaded trade history of $symbol: ${responses.size}")
+            println("$symbol: ${responses.size}")
             records.addAll(responses.map { it.toTradeRecord(symbol) })
             delay(5000)
         }
@@ -197,7 +201,7 @@ object BinanceDownloader {
                 symbol = "${symbol.toBinanceString()}_PERP",
                 startTime = startTime.toInstant().toEpochMilli()
             )
-            println("Downloaded profit loss history of $symbol: ${responses.size}")
+            println("$symbol: ${responses.size}")
             records.addAll(responses.map { it.toProfitLossRecord(symbol) })
             delay(5000)
         }

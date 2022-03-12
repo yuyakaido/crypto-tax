@@ -5,10 +5,13 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import model.Asset
 import model.Side
-import model.Symbol
 import model.SpotTradeRecord
+import model.Symbol
 import java.math.BigDecimal
-import java.time.*
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 @Serializable
 data class SpotTradeResponse(
@@ -26,12 +29,12 @@ data class SpotTradeResponse(
     @SerialName("isMaker") val isMaker: Boolean,
     @SerialName("isBestMatch") val isBestMatch: Boolean
 ) {
-    fun toTradeRecord(): SpotTradeRecord {
+    fun toTradeRecord(symbol: Symbol): SpotTradeRecord {
         return SpotTradeRecord(
             tradedAt = ZonedDateTime
                 .ofInstant(Instant.ofEpochMilli(time), ZoneOffset.UTC)
                 .withZoneSameInstant(ZoneId.systemDefault()),
-            symbol = Symbol.from(Asset.pair(symbol)),
+            symbol = symbol,
             side = if (isBuyer) { Side.Buy } else { Side.Sell },
             tradePrice = price,
             tradeAmount = qty,

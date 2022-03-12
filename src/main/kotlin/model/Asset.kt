@@ -38,7 +38,6 @@ data class Asset(
          *   - btc_jpy(bitbank)
          *   - BTC_USDT(Poloniex)
          *   - BTC-USDT(Bittrex)
-         *   - BTCUSDT(Bybit)
          */
         fun pair(symbol: String): Pair<Asset, Asset> {
             val assets = symbol.split("/", "_", "-")
