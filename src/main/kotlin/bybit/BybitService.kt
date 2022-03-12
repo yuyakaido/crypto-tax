@@ -71,6 +71,13 @@ object BybitService : Service {
 //                records = flexibleStakingDistributionRecords
 //            )
 //        )
+//        val launchpoolDistributionRecords = BybitImporter.importLaunchpoolDistributionRecords()
+//        JsonExporter.export(
+//            DistributionHistory(
+//                name = "bybit_launchpool_distribution_history",
+//                records = launchpoolDistributionRecords
+//            )
+//        )
     }
 
 }
