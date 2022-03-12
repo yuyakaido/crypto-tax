@@ -31,7 +31,7 @@ object BitflyerService : Service {
 //        )
 //        val tradeRecords = BitflyerImporter.importTradeRecords()
 //        JsonExporter.export(
-//            TradeHistory(
+//            SpotTradeHistory(
 //                name = "bitflyer_trade_history",
 //                records = tradeRecords
 //            )
